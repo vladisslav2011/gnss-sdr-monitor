@@ -110,6 +110,11 @@ void ConstellationDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         }
     }
 
+    if(max_x == min_x)
+        max_x = min_x+1;
+    if(max_y == min_y)
+        max_y = min_y+1;
+
     QVector<QPointF> fpoints;
     foreach (p, points)
     {

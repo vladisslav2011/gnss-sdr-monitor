@@ -166,11 +166,11 @@ void MainWindow::updateChart(QtCharts::QChart *chart, QtCharts::QXYSeries *serie
     QPointF p;
     QVector<QPointF> points;
 
-    double min_x = std::numeric_limits<double>::max();
-    double max_x = -std::numeric_limits<double>::max();
+    double min_x = std::numeric_limits<int>::max();
+    double max_x = -std::numeric_limits<int>::max();
 
-    double min_y = std::numeric_limits<double>::max();
-    double max_y = -std::numeric_limits<double>::max();
+    double min_y = std::numeric_limits<int>::max();
+    double max_y = -std::numeric_limits<int>::max();
 
     QList<QVariant> var = index.data(Qt::DisplayRole).toList();
     for (int i = 0; i < var.size(); i++)
@@ -184,6 +184,10 @@ void MainWindow::updateChart(QtCharts::QChart *chart, QtCharts::QXYSeries *serie
         max_x = std::max(max_x, p.x());
         max_y = std::max(max_y, p.y());
     }
+    if(max_x == min_x)
+        max_x = min_x+1;
+    if(max_y == min_y)
+        max_y = min_y+1;
 
     series->replace(points);
 
@@ -264,7 +268,7 @@ gnss_sdr::Observables MainWindow::readGnssSynchro(char buff[], int bytes)
     }
     catch (std::exception &e)
     {
-        qDebug() << e.what();
+        qDebug() << "MainWindow::readGnssSynchro " << e.what();
     }
 
     return m_stocks;
@@ -279,7 +283,7 @@ gnss_sdr::MonitorPvt MainWindow::readMonitorPvt(char buff[], int bytes)
     }
     catch (std::exception &e)
     {
-        qDebug() << e.what();
+        qDebug() << "MainWindow::readMonitorPvt" << e.what();
     }
 
     return m_monitorPvt;

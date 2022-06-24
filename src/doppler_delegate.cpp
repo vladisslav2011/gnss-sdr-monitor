@@ -67,11 +67,11 @@ void DopplerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
         y_data << var.at(i).toPointF().y();
     }
 
-    double min_x = std::numeric_limits<double>::max();
-    double max_x = -std::numeric_limits<double>::max();
+    double min_x = std::numeric_limits<int>::max();
+    double max_x = -std::numeric_limits<int>::max();
 
-    double min_y = std::numeric_limits<double>::max();
-    double max_y = -std::numeric_limits<double>::max();
+    double min_y = std::numeric_limits<int>::max();
+    double max_y = -std::numeric_limits<int>::max();
 
     int em_w = option.fontMetrics.height();
 
@@ -138,6 +138,11 @@ void DopplerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
             max_y = val.y();
         }
     }
+
+    if(max_x == min_x)
+        max_x = min_x+1;
+    if(max_y == min_y)
+        max_y = min_y+1;
 
     foreach (val, points)
     {

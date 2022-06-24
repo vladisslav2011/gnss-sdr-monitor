@@ -99,16 +99,16 @@ void Cn0Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
         y_data << var.at(i).toPointF().y();
     }
 
-    double min_x = std::numeric_limits<double>::max();
-    double max_x = -std::numeric_limits<double>::max();
+    double min_x = std::numeric_limits<int>::max();
+    double max_x = -std::numeric_limits<int>::max();
 
     double min_y = m_minCn0;
     double max_y = m_maxCn0;
 
     if (m_autoRangeEnabled)
     {
-        min_y = std::numeric_limits<double>::max();
-        max_y = -std::numeric_limits<double>::max();
+        min_y = std::numeric_limits<int>::max();
+        max_y = -std::numeric_limits<int>::max();
     }
 
     int em_w = option.fontMetrics.height();
@@ -182,6 +182,11 @@ void Cn0Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
             }
         }
     }
+
+    if(max_x == min_x)
+        max_x = min_x+1;
+    if(max_y == min_y)
+        max_y = min_y+1;
 
     // Map the real CN0 data to the sparkline coordinate system.
     foreach (val, points)
