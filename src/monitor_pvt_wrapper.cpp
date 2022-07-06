@@ -53,6 +53,8 @@ MonitorPvtWrapper::MonitorPvtWrapper(QObject *parent) : QObject(parent)
  */
 void MonitorPvtWrapper::addMonitorPvt(const gnss_sdr::MonitorPvt &monitor_pvt)
 {
+    if(m_bufferMonitorPvt.back().tow_at_current_symbol_ms() == monitor_pvt.tow_at_current_symbol_ms())
+        return;
     m_bufferMonitorPvt.push_back(monitor_pvt);
 
     Coordinates coord;

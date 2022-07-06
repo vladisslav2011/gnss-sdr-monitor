@@ -101,6 +101,8 @@ DOPWidget::DOPWidget(QWidget *parent) : QWidget(parent)
  */
 void DOPWidget::addData(qreal tow, qreal gdop, qreal pdop, qreal hdop, qreal vdop)
 {
+    if(m_gdopBuffer.back().x() == tow)
+        return;
     m_gdopBuffer.push_back(QPointF(tow, gdop));
     m_pdopBuffer.push_back(QPointF(tow, pdop));
     m_hdopBuffer.push_back(QPointF(tow, hdop));

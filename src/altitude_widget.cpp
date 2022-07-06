@@ -80,6 +80,8 @@ AltitudeWidget::AltitudeWidget(QWidget *parent) : QWidget(parent)
  */
 void AltitudeWidget::addData(qreal tow, qreal altitude)
 {
+    if(m_altitudeBuffer.back().x() == tow)
+        return;
     m_altitudeBuffer.push_back(QPointF(tow, altitude));
 }
 
