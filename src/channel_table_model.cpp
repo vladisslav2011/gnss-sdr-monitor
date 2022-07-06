@@ -50,7 +50,12 @@ ChannelTableModel::ChannelTableModel()
     m_mapSignalPrettyName["2S"] = "L2C";
     m_mapSignalPrettyName["2G"] = "L2 C/A";
     m_mapSignalPrettyName["5X"] = "E5a";
+    m_mapSignalPrettyName["7X"] = "E5b";
+    m_mapSignalPrettyName["6X"] = "E6";
     m_mapSignalPrettyName["L5"] = "L5";
+    m_mapSignalPrettyName["B1"] = "B1";
+    m_mapSignalPrettyName["B2"] = "B2";
+    m_mapSignalPrettyName["B3"] = "B3";
 
     m_columns = 11;
     m_bufferSize = DEFAULT_BUFFER_SIZE;
@@ -87,15 +92,15 @@ QVariant ChannelTableModel::data(const QModelIndex &index, int role) const
 
             QString channel_signal = m_channelsSignal.at(channel_id);
 
-            boost::circular_buffer<double> channel_time_cbuf =
+            const boost::circular_buffer<double> & channel_time_cbuf =
                 m_channelsTime.at(channel_id);
-            boost::circular_buffer<double> channel_prompt_i_cbuf =
+            const boost::circular_buffer<double> & channel_prompt_i_cbuf =
                 m_channelsPromptI.at(channel_id);
-            boost::circular_buffer<double> channel_prompt_q_cbuf =
+            const boost::circular_buffer<double> & channel_prompt_q_cbuf =
                 m_channelsPromptQ.at(channel_id);
-            boost::circular_buffer<double> channel_cn0_cbuf =
+            const boost::circular_buffer<double> & channel_cn0_cbuf =
                 m_channelsCn0.at(channel_id);
-            boost::circular_buffer<double> channel_doppler_cbuf =
+            const boost::circular_buffer<double> & channel_doppler_cbuf =
                 m_channelsDoppler.at(channel_id);
 
             QList<QVariant> channel_prompt_iq;
@@ -420,6 +425,14 @@ QString ChannelTableModel::getSignalPrettyName(const gnss_sdr::GnssSynchro *ch)
         else if (ch->system() == "E")
         {
             system_name = QStringLiteral("Galileo");
+        }
+        else if (ch->system() == "C")
+        {
+            system_name = QStringLiteral("BeiDou");
+        }
+        else if (ch->system() == "R")
+        {
+            system_name = QStringLiteral("Glonass");
         }
 
         if (m_mapSignalPrettyName.find(ch->signal()) != m_mapSignalPrettyName.end())
