@@ -51,7 +51,7 @@ ChannelTableModel::ChannelTableModel()
     m_mapSignalPrettyName["2G"] = "L2 C/A";
     m_mapSignalPrettyName["5X"] = "E5a";
     m_mapSignalPrettyName["7X"] = "E5b";
-    m_mapSignalPrettyName["6X"] = "E6";
+    m_mapSignalPrettyName["E6"] = "E6";
     m_mapSignalPrettyName["L5"] = "L5";
     m_mapSignalPrettyName["B1"] = "B1";
     m_mapSignalPrettyName["B2"] = "B2";
