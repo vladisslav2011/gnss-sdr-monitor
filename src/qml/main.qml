@@ -59,6 +59,8 @@ Map
     {
         id: mapPlugin
         name: "osm"
+        PluginParameter { name: "osm.useragent"; value: "GNSS-SDR Monitor" }
+        PluginParameter { name: "osm.mapping.custom.host"; value: "http://tile.openstreetmap.org/" }
 
 //        PluginParameter
 //       {
@@ -66,6 +68,7 @@ Map
 //            value: 19.90
 //        }
     }
+    activeMapType: supportedMapTypes[supportedMapTypes.length - 1]
     center: cttc
     zoomLevel: 15
 
