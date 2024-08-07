@@ -327,6 +327,7 @@ void MainWindow::loadSettings()
     m_settings.endGroup();
 
     setPort();
+    m_model->setBufferSize();
 
     qDebug() << "Settings Loaded";
 }
