@@ -83,6 +83,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_monitorPvtWrapper, &MonitorPvtWrapper::altitudeChanged, m_altitudeWidget, &AltitudeWidget::addData);
     connect(&m_updateTimer, &QTimer::timeout, m_altitudeWidget, &AltitudeWidget::redraw);
 
+    // PPM widget.
+    m_ppmDockWidget = new QDockWidget("PPM", this);
+    m_ppmWidget = new PpmWidget(m_ppmDockWidget);
+    m_ppmDockWidget->setWidget(m_ppmWidget);
+    addDockWidget(Qt::TopDockWidgetArea, m_ppmDockWidget);
+    connect(m_monitorPvtWrapper, &MonitorPvtWrapper::ppmChanged, m_ppmWidget, &PpmWidget::addData);
+    connect(&m_updateTimer, &QTimer::timeout, m_ppmWidget, &PpmWidget::redraw);
+
     // Dilution of precision widget.
     m_DOPDockWidget = new QDockWidget("DOP", this);
     m_DOPWidget = new DOPWidget(m_DOPDockWidget);
@@ -111,6 +119,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->mainToolBar->addAction(m_telecommandDockWidget->toggleViewAction());
     ui->mainToolBar->addAction(m_mapDockWidget->toggleViewAction());
     ui->mainToolBar->addAction(m_altitudeDockWidget->toggleViewAction());
+    ui->mainToolBar->addAction(m_ppmDockWidget->toggleViewAction());
     ui->mainToolBar->addAction(m_DOPDockWidget->toggleViewAction());
     m_start->setEnabled(false);
     m_stop->setEnabled(true);
@@ -252,6 +261,7 @@ void MainWindow::clearEntries()
     m_model->update();
 
     m_altitudeWidget->clear();
+    m_ppmWidget->clear();
     m_DOPWidget->clear();
 
     m_clear->setEnabled(false);

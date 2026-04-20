@@ -39,6 +39,7 @@
 #include "gnss_synchro.pb.h"
 #include "monitor_pvt.pb.h"
 #include "monitor_pvt_wrapper.h"
+#include "ppm_widget.h"
 #include "telecommand_widget.h"
 #include <QAbstractTableModel>
 #include <QChart>
@@ -97,11 +98,13 @@ private:
     QDockWidget *m_mapDockWidget;
     QDockWidget *m_telecommandDockWidget;
     QDockWidget *m_altitudeDockWidget;
+    QDockWidget *m_ppmDockWidget;
     QDockWidget *m_DOPDockWidget;
 
     QQuickWidget *m_mapWidget;
     TelecommandWidget *m_telecommandWidget;
     AltitudeWidget *m_altitudeWidget;
+    PpmWidget *m_ppmWidget;
     DOPWidget *m_DOPWidget;
 
     ChannelTableModel *m_model;
