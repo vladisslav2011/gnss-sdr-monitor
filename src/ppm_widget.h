@@ -51,6 +51,8 @@ public slots:
     void redraw();
     void clear();
     void setBufferSize(size_t size);
+    void setFilter(double value);
+    void setDecim(int value);
 
 private:
     size_t m_bufferSize;
@@ -63,6 +65,10 @@ private:
 
     double max_x;
     double max_y;
+    qreal filtered;
+    qreal alfa;
+    int decim;
+    int count;
 };
 
 #endif  // GNSS_SDR_MONITOR_PPM_WIDGET_H_

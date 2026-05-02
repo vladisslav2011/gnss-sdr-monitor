@@ -81,7 +81,7 @@ public slots:
     void clearEntries();
     void quit();
     void showPreferences();
-    void setPort();
+    void setPreferences();
     void expandPlot(const QModelIndex &index);
     void closePlots();
     void deletePlots();

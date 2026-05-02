@@ -335,8 +335,14 @@ void MainWindow::loadSettings()
     }
     m_settings.endArray();
     m_settings.endGroup();
+    m_settings.beginGroup("Preferences_Dialog");
+    m_monitorPvtWrapper->setBufferSize(m_settings.value("pvt_buffer_size",1000).toInt());
+    m_ppmWidget->setBufferSize(m_settings.value("ppm_buffer_size",1000).toInt());
+    m_ppmWidget->setDecim(m_settings.value("ppm_decim",1).toInt());
+    m_ppmWidget->setFilter(m_settings.value("ppm_filter",1.).toDouble());
+    m_settings.endGroup();
 
-    setPort();
+    setPreferences();
     m_model->setBufferSize();
 
     qDebug() << "Settings Loaded";
@@ -348,16 +354,20 @@ void MainWindow::showPreferences()
     connect(preferences, &PreferencesDialog::accepted, m_model,
         &ChannelTableModel::setBufferSize);
     connect(preferences, &PreferencesDialog::accepted, this,
-        &MainWindow::setPort);
+        &MainWindow::setPreferences);
     preferences->exec();
 }
 
-void MainWindow::setPort()
+void MainWindow::setPreferences()
 {
     QSettings settings;
     settings.beginGroup("Preferences_Dialog");
     m_portGnssSynchro = settings.value("port_gnss_synchro", 1111).toInt();
     m_portMonitorPvt = settings.value("port_monitor_pvt", 1112).toInt();
+    m_monitorPvtWrapper->setBufferSize(settings.value("pvt_buffer_size",1000).toInt());
+    m_ppmWidget->setBufferSize(settings.value("ppm_buffer_size",1000).toInt());
+    m_ppmWidget->setDecim(settings.value("ppm_decim",1).toInt());
+    m_ppmWidget->setFilter(settings.value("ppm_filter",1.).toDouble());
     settings.endGroup();
 
     m_socketGnssSynchro->disconnectFromHost();

@@ -43,6 +43,9 @@ PpmWidget::PpmWidget(QWidget *parent) : QWidget(parent)
 {
     // Default buffer size.
     m_bufferSize = 100;
+    alfa=1.;
+    decim=1;
+    count=0;filtered=0.;
 
     m_dataBuffer.resize(m_bufferSize);
     m_dataBuffer.clear();
@@ -82,7 +85,13 @@ void PpmWidget::addData(qreal tow, qreal ppm)
 {
     if(m_dataBuffer.back().x() == tow)
         return;
-    m_dataBuffer.push_back(QPointF(tow, ppm));
+    count++;
+    filtered+=(ppm-filtered)*alfa;
+    if(count>=decim)
+    {
+        m_dataBuffer.push_back(QPointF(tow, filtered));
+        count=0;
+    }
 }
 
 /*!
@@ -135,6 +144,29 @@ void PpmWidget::clear()
  */
 void PpmWidget::setBufferSize(size_t size)
 {
+    printf("ppm widget buffer=%lu\n",size);
+    if(m_bufferSize == size)
+        return;
     m_bufferSize = size;
     m_dataBuffer.resize(m_bufferSize);
+    clear();
 }
+
+void PpmWidget::setFilter(double value)
+{
+    printf("ppm widget alfa=%f\n",value);
+    if(alfa==value)
+        return;
+    alfa=qreal(value);
+}
+
+void PpmWidget::setDecim(int value)
+{
+    printf("ppm widget decim=%d\n",value);
+    if(decim==value)
+        return;
+    decim=value;
+    if(count>=value)
+        count=0;
+}
+
