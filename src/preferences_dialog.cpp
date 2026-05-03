@@ -48,7 +48,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent),
     ui->pvt_buffer_size_spinBox->setValue(settings.value("pvt_buffer_size", 1000).toInt());
     ui->ppm_buffer_size_spinBox->setValue(settings.value("ppm_buffer_size", 1000).toInt());
     ui->ppm_filter_doubleSpinBox->setValue(settings.value("ppm_filter", 1).toDouble());
-    ui->ppm_decim_spinBox->setValue(settings.value("ppm_decima", 1).toInt());
+    ui->ppm_decim_spinBox->setValue(settings.value("ppm_decim", 1).toInt());
     settings.endGroup();
 
     connect(this, &PreferencesDialog::accepted, this, &PreferencesDialog::onAccept);
