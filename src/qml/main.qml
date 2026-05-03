@@ -60,8 +60,8 @@ Map
         id: mapPlugin
         name: "osm"
         PluginParameter { name: "osm.useragent"; value: "GNSS-SDR Monitor" }
-        PluginParameter { name: "osm.mapping.custom.host"; value: "http://tile.openstreetmap.org/" }
-
+        PluginParameter { name: "osm.mapping.custom.host"; value: "https://tile.openstreetmap.org/" }
+        PluginParameter { name: "osm.mapping.providersrepository.disabled"; value: "true" }
 //        PluginParameter
 //       {
 //            name: "esri.mapping.maximumZoomLevel"
