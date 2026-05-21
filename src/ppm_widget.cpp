@@ -144,7 +144,6 @@ void PpmWidget::clear()
  */
 void PpmWidget::setBufferSize(size_t size)
 {
-    printf("ppm widget buffer=%lu\n",size);
     if(m_bufferSize == size)
         return;
     m_bufferSize = size;
@@ -154,7 +153,6 @@ void PpmWidget::setBufferSize(size_t size)
 
 void PpmWidget::setFilter(double value)
 {
-    printf("ppm widget alfa=%f\n",value);
     if(alfa==value)
         return;
     alfa=qreal(value);
@@ -162,7 +160,6 @@ void PpmWidget::setFilter(double value)
 
 void PpmWidget::setDecim(int value)
 {
-    printf("ppm widget decim=%d\n",value);
     if(decim==value)
         return;
     decim=value;
