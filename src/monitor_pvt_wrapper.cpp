@@ -61,11 +61,12 @@ void MonitorPvtWrapper::addMonitorPvt(const gnss_sdr::MonitorPvt &monitor_pvt)
     coord.latitude = monitor_pvt.latitude();
     coord.longitude = monitor_pvt.longitude();
     m_path.push_back(coord);
+    double TOW_s = monitor_pvt.tow_at_current_symbol_ms() * 0.001;
 
     emit dataChanged();
-    emit altitudeChanged(monitor_pvt.tow_at_current_symbol_ms(), monitor_pvt.height());
-    emit ppmChanged(monitor_pvt.tow_at_current_symbol_ms(), monitor_pvt.user_clk_drift_ppm());
-    emit dopChanged(monitor_pvt.tow_at_current_symbol_ms(), monitor_pvt.gdop(), monitor_pvt.pdop(), monitor_pvt.hdop(), monitor_pvt.vdop());
+    emit altitudeChanged(TOW_s, monitor_pvt.height());
+    emit ppmChanged(TOW_s, monitor_pvt.user_clk_drift_ppm());
+    emit dopChanged(TOW_s, monitor_pvt.gdop(), monitor_pvt.pdop(), monitor_pvt.hdop(), monitor_pvt.vdop());
 }
 
 /*!
