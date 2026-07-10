@@ -114,6 +114,11 @@ Map
             id: follow
             checked: true
             text: "Follow"
+            onToggled:
+            {
+                crosshair_h.visible = !follow.checked;
+                crosshair_v.visible = !follow.checked;
+            }
         }
     }
 
@@ -191,6 +196,32 @@ Map
         Component.onCompleted: {
             map.calculateScale();
         }
+    }
+    Rectangle {
+        id: crosshair_h
+        visible: false
+        width: 20
+        height: 1
+        color: "grey"
+        border.color: "transparent"
+        border.width: 0
+
+        // Keeps it permanently locked to the exact center of the screen
+        anchors.centerIn: parent
+        z: 10 
+    }
+    Rectangle {
+        id: crosshair_v
+        visible: false
+        width: 1
+        height: 20
+        color: "grey"
+        border.color: "transparent"
+        border.width: 0
+
+        // Keeps it permanently locked to the exact center of the screen
+        anchors.centerIn: parent
+        z: 10 
     }
     
     
