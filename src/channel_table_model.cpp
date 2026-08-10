@@ -46,16 +46,21 @@ ChannelTableModel::ChannelTableModel()
 {
     m_mapSignalPrettyName["1C"] = "L1 C/A";
     m_mapSignalPrettyName["1B"] = "E1";
-    m_mapSignalPrettyName["1G"] = "L1 C/A";
+    m_mapSignalPrettyName["1G"] = "L1OF";
     m_mapSignalPrettyName["2S"] = "L2C";
-    m_mapSignalPrettyName["2G"] = "L2 C/A";
+    m_mapSignalPrettyName["2G"] = "L2OF";
     m_mapSignalPrettyName["5X"] = "E5a";
     m_mapSignalPrettyName["7X"] = "E5b";
     m_mapSignalPrettyName["E6"] = "E6";
     m_mapSignalPrettyName["L5"] = "L5";
-    m_mapSignalPrettyName["B1"] = "B1";
-    m_mapSignalPrettyName["B2"] = "B2";
-    m_mapSignalPrettyName["B3"] = "B3";
+    m_mapSignalPrettyName["B1"] = "B1I";
+    m_mapSignalPrettyName["B2"] = "B2I";
+    m_mapSignalPrettyName["B3"] = "B3I";
+    m_mapSignalPrettyName["1D"] = "B1C";
+    m_mapSignalPrettyName["S1"] = "L1";
+    m_mapSignalPrettyName["J1"] = "L1 C/A";
+    m_mapSignalPrettyName["J5"] = "L5";
+    m_mapSignalPrettyName["I5"] = "I5";
 
     m_columns = 11;
     m_bufferSize = DEFAULT_BUFFER_SIZE;
@@ -209,6 +214,14 @@ QVariant ChannelTableModel::data(const QModelIndex &index, int role) const
                 else if (channel.system() == "C")
                 {
                     return QIcon(":/images/flag-cn.png");
+                }
+                else if (channel.system() == "J")
+                {
+                    return QIcon(":/images/flag-jp.png");
+                }
+                else if (channel.system() == "I")
+                {
+                    return QIcon(":/images/flag-in.png");
                 }
             }
         }
@@ -433,6 +446,18 @@ QString ChannelTableModel::getSignalPrettyName(const gnss_sdr::GnssSynchro *ch)
         else if (ch->system() == "R")
         {
             system_name = QStringLiteral("Glonass");
+        }
+        else if (ch->system() == "J")
+        {
+            system_name = QStringLiteral("QZSS");
+        }
+        else if (ch->system() == "I")
+        {
+            system_name = QStringLiteral("IRNSS");
+        }
+        else if (ch->system() == "S")
+        {
+            system_name = QStringLiteral("SBAS");
         }
 
         if (m_mapSignalPrettyName.find(ch->signal()) != m_mapSignalPrettyName.end())
