@@ -153,7 +153,7 @@ QVariant ChannelTableModel::data(const QModelIndex &index, int role) const
                     return channel.tow_at_current_symbol_ms();
 
                 case 9:
-                    return channel.flag_valid_word();
+                    return int(channel.flag_valid_symbol_output())|(int(channel.flag_valid_word())<<1);
 
                 case 10:
                     return channel.pseudorange_m();

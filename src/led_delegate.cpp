@@ -53,13 +53,16 @@ void LedDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
 
     int size = qMin(option.rect.width(), option.rect.height());
 
-    bool state = index.model()->data(index, Qt::DisplayRole).toBool();
+    int state = index.model()->data(index, Qt::DisplayRole).toInt();
 
     painter->save();
 
-    if (state)
+    if (state & 1)
     {
-        painter->setBrush(QBrush(QColor("#01FF70"), Qt::SolidPattern));
+        if (state & 2)
+            painter->setBrush(QBrush(QColor("#01FF70"), Qt::SolidPattern));
+        else
+            painter->setBrush(QBrush(QColor("#dFdF40"), Qt::SolidPattern));
     }
     else
     {
