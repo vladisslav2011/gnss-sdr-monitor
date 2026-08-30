@@ -112,15 +112,6 @@ QVariant ChannelTableModel::data(const QModelIndex &index, int role) const
             QList<QVariant> channel_cn0;
             QList<QVariant> channel_doppler;
 
-            for (int i = 0; i < channel_cn0_cbuf.size(); i++)
-            {
-                channel_prompt_iq << QPointF(channel_prompt_i_cbuf.at(i),
-                    channel_prompt_q_cbuf.at(i));
-                channel_cn0 << QPointF(channel_time_cbuf.at(i), channel_cn0_cbuf.at(i));
-                channel_doppler << QPointF(channel_time_cbuf.at(i),
-                    channel_doppler_cbuf.at(i));
-            }
-
             if (role == Qt::DisplayRole)
             {
                 switch (index.column())
@@ -141,12 +132,20 @@ QVariant ChannelTableModel::data(const QModelIndex &index, int role) const
                     return channel.acq_delay_samples();
 
                 case 5:
+                    for (int i = 0; i < channel_cn0_cbuf.size(); i++)
+                        channel_prompt_iq << QPointF(channel_prompt_i_cbuf.at(i),
+                            channel_prompt_q_cbuf.at(i));
                     return channel_prompt_iq;
 
                 case 6:
+                    for (int i = 0; i < channel_cn0_cbuf.size(); i++)
+                        channel_cn0 << QPointF(channel_time_cbuf.at(i), channel_cn0_cbuf.at(i));
                     return channel_cn0;
 
                 case 7:
+                    for (int i = 0; i < channel_cn0_cbuf.size(); i++)
+                        channel_doppler << QPointF(channel_time_cbuf.at(i),
+                            channel_doppler_cbuf.at(i));
                     return channel_doppler;
 
                 case 8:
