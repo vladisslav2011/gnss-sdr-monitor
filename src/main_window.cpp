@@ -99,6 +99,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_monitorPvtWrapper, &MonitorPvtWrapper::dopChanged, m_DOPWidget, &DOPWidget::addData);
     connect(&m_updateTimer, &QTimer::timeout, m_DOPWidget, &DOPWidget::redraw);
 
+    // Skyview widget.
+    m_SkyViewDockWidget = new QDockWidget("SkyView", this);
+    m_SkyViewWidget = new SkyViewWidget(m_SkyViewDockWidget);
+    m_SkyViewDockWidget->setWidget(m_SkyViewWidget);
+    addDockWidget(Qt::TopDockWidgetArea, m_SkyViewDockWidget);
+    connect(&m_updateTimer, &QTimer::timeout, m_SkyViewWidget, &SkyViewWidget::redraw);
+
     // QMenuBar.
     ui->actionQuit->setIcon(QIcon::fromTheme("application-exit"));
     ui->actionQuit->setShortcuts(QKeySequence::Quit);
@@ -121,6 +128,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->mainToolBar->addAction(m_altitudeDockWidget->toggleViewAction());
     ui->mainToolBar->addAction(m_ppmDockWidget->toggleViewAction());
     ui->mainToolBar->addAction(m_DOPDockWidget->toggleViewAction());
+    ui->mainToolBar->addAction(m_SkyViewDockWidget->toggleViewAction());
     m_start->setEnabled(false);
     m_stop->setEnabled(true);
     m_clear->setEnabled(false);
@@ -250,6 +258,12 @@ void MainWindow::receiveMonitorPvt()
         if (m_stop->isEnabled())
         {
             m_monitorPvtWrapper->addMonitorPvt(m_monitorPvt);
+            m_SkyViewWidget->clear();
+            for(int k=0;k<m_monitorPvt.used_satellites_size();k++)
+            {
+                auto & s = m_monitorPvt.used_satellites(k);
+                m_SkyViewWidget->addData(s.prn(),s.azimuth_deg(),s.elevation_deg(),s.system(),s.signal(),s.combined(),40,0);
+            }
             // clear->setEnabled(true);
         }
     }
@@ -263,6 +277,7 @@ void MainWindow::clearEntries()
     m_altitudeWidget->clear();
     m_ppmWidget->clear();
     m_DOPWidget->clear();
+    m_SkyViewWidget->clear();
 
     m_clear->setEnabled(false);
 }

@@ -1,9 +1,9 @@
 /*!
- * \file altitude_widget.h
- * \brief Interface of a widget that shows the altitude in a chart as
+ * \file skyplot_widget.h
+ * \brief Interface of a widget that shows satellite positions as
  * reported by the receiver.
  *
- * \author Álvaro Cebrián Juan, 2019. acebrianjuan(at)gmail.com
+ * \author vladisslav2011(at)gmail.com
  *
  * -----------------------------------------------------------------------
  *

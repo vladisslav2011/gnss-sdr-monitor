@@ -56,6 +56,7 @@ set(SOURCES
     altitude_widget.cpp
     ppm_widget.cpp
     dop_widget.cpp
+    skyview_widget.cpp
     ${PROTO_SRCS}
     ${PROTO_SRCS2}
 )

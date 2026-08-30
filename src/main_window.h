@@ -40,6 +40,7 @@
 #include "monitor_pvt.pb.h"
 #include "monitor_pvt_wrapper.h"
 #include "ppm_widget.h"
+#include "skyview_widget.h"
 #include "telecommand_widget.h"
 #include <QAbstractTableModel>
 #include <QChart>
@@ -100,12 +101,14 @@ private:
     QDockWidget *m_altitudeDockWidget;
     QDockWidget *m_ppmDockWidget;
     QDockWidget *m_DOPDockWidget;
+    QDockWidget *m_SkyViewDockWidget;
 
     QQuickWidget *m_mapWidget;
     TelecommandWidget *m_telecommandWidget;
     AltitudeWidget *m_altitudeWidget;
     PpmWidget *m_ppmWidget;
     DOPWidget *m_DOPWidget;
+    SkyViewWidget *m_SkyViewWidget;
 
     ChannelTableModel *m_model;
     QUdpSocket *m_socketGnssSynchro;
