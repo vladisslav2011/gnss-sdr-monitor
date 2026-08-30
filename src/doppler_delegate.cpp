@@ -57,7 +57,7 @@ void DopplerDelegate::setBufferSize(int size)
 void DopplerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     const QModelIndex &index) const
 {
-    QList<QPointF> points = index.data(Qt::DisplayRole).value<QList<QPointF>>();
+    const QVector<QPointF> &points = index.data(Qt::DisplayRole).value<QVector<QPointF>>();
     QVector<double> x_data, y_data;
 
     double min_x = std::numeric_limits<int>::max();
@@ -103,32 +103,33 @@ void DopplerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
     {
         return;
     }
+    // Get pointers to a range of elements is within the designated buffer size.
+    size_t idx = 0;
+    if (points.length() > m_bufferSize)
+        idx = points.length() - m_bufferSize;
+    const QPointF *points_begin = &points[idx];
+    const QPointF *points_end = &points[points.length()];
 
-    while (points.length() > m_bufferSize)
+    for (const QPointF *val = points_begin; val != points_end; val ++)
     {
-        points.removeFirst();
-    }
-
-    foreach (val, points)
-    {
-        if (val.x() < min_x)
+        if (val->x() < min_x)
         {
-            min_x = val.x();
+            min_x = val->x();
         }
 
-        if (val.x() > max_x)
+        if (val->x() > max_x)
         {
-            max_x = val.x();
+            max_x = val->x();
         }
 
-        if (val.y() < min_y)
+        if (val->y() < min_y)
         {
-            min_y = val.y();
+            min_y = val->y();
         }
 
-        if (val.y() > max_y)
+        if (val->y() > max_y)
         {
-            max_y = val.y();
+            max_y = val->y();
         }
     }
 
@@ -137,10 +138,10 @@ void DopplerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
     if(max_y == min_y)
         max_y = min_y+1;
 
-    foreach (val, points)
+    for (const QPointF *val = points_begin; val != points_end; val ++)
     {
-        double x = sparklineWidth * (val.x() - min_x) / (max_x - min_x);
-        double y = contentHeight - (contentHeight * (val.y() - min_y) / (max_y - min_y));
+        double x = sparklineWidth * (val->x() - min_x) / (max_x - min_x);
+        double y = contentHeight - (contentHeight * (val->y() - min_y) / (max_y - min_y));
         fpoints.append(QPointF(x, y));
     }
 

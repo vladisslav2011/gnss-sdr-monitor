@@ -49,7 +49,7 @@ ConstellationDelegate::~ConstellationDelegate()
 void ConstellationDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     const QModelIndex &index) const
 {
-    QList<QPointF> points = index.data(Qt::DisplayRole).value<QList<QPointF>>();
+    const QVector<QPointF> &points = index.data(Qt::DisplayRole).value<QVector<QPointF>>();
     QVector<double> x_data, y_data;
 
 

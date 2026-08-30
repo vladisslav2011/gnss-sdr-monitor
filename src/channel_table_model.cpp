@@ -108,9 +108,6 @@ QVariant ChannelTableModel::data(const QModelIndex &index, int role) const
             const boost::circular_buffer<double> & channel_doppler_cbuf =
                 m_channelsDoppler.at(channel_id);
 
-            QList<QPointF> channel_prompt_iq;
-            QList<QPointF> channel_cn0;
-            QList<QPointF> channel_doppler;
 
             if (role == Qt::DisplayRole)
             {
@@ -132,21 +129,30 @@ QVariant ChannelTableModel::data(const QModelIndex &index, int role) const
                     return channel.acq_delay_samples();
 
                 case 5:
-                    for (int i = 0; i < channel_cn0_cbuf.size(); i++)
-                        channel_prompt_iq << QPointF(channel_prompt_i_cbuf.at(i),
-                            channel_prompt_q_cbuf.at(i));
-                    return QVariant::fromValue(channel_prompt_iq);
+                    {
+                        QVector<QPointF> channel_prompt_iq(channel_cn0_cbuf.size());
+                        for (int i = 0; i < channel_cn0_cbuf.size(); i++)
+                            channel_prompt_iq.replace(i, QPointF(channel_prompt_i_cbuf.at(i),
+                                channel_prompt_q_cbuf.at(i)));
+                        return QVariant::fromValue(channel_prompt_iq);
+                    }
 
                 case 6:
-                    for (int i = 0; i < channel_cn0_cbuf.size(); i++)
-                        channel_cn0 << QPointF(channel_time_cbuf.at(i), channel_cn0_cbuf.at(i));
-                    return QVariant::fromValue(channel_cn0);
+                    {
+                        QVector<QPointF> channel_cn0(channel_cn0_cbuf.size());
+                        for (int i = 0; i < channel_cn0_cbuf.size(); i++)
+                            channel_cn0.replace(i, QPointF(channel_time_cbuf.at(i), channel_cn0_cbuf.at(i)));
+                        return QVariant::fromValue(channel_cn0);
+                    }
 
                 case 7:
-                    for (int i = 0; i < channel_cn0_cbuf.size(); i++)
-                        channel_doppler << QPointF(channel_time_cbuf.at(i),
-                            channel_doppler_cbuf.at(i));
-                    return QVariant::fromValue(channel_doppler);
+                    {
+                        QVector<QPointF> channel_doppler(channel_cn0_cbuf.size());
+                        for (int i = 0; i < channel_cn0_cbuf.size(); i++)
+                            channel_doppler.replace(i, QPointF(channel_time_cbuf.at(i),
+                                channel_doppler_cbuf.at(i)));
+                        return QVariant::fromValue(channel_doppler);
+                    }
 
                 case 8:
                     return channel.tow_at_current_symbol_ms();

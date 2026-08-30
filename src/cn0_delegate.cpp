@@ -89,7 +89,7 @@ void Cn0Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
 {
     bool outOfScale = false;
 
-    QList<QPointF> points = index.data(Qt::DisplayRole).value<QList<QPointF>>();
+    const QVector<QPointF> &points = index.data(Qt::DisplayRole).value<QVector<QPointF>>();
     QVector<double> x_data, y_data;
 
     double min_x = std::numeric_limits<int>::max();
@@ -142,36 +142,37 @@ void Cn0Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
         return;
     }
 
-    // Remove first points until the number of elements is within the designated buffer size.
-    while (points.length() > m_bufferSize)
-    {
-        points.removeFirst();
-    }
+    // Get pointers to a range of elements is within the designated buffer size.
+    size_t idx = 0;
+    if (points.length() > m_bufferSize)
+        idx = points.length() - m_bufferSize;
+    const QPointF *points_begin = &points[idx];
+    const QPointF *points_end = &points[points.length()];
 
-    foreach (val, points)
+    for (const QPointF *val = points_begin; val != points_end; val ++)
     {
         // Find the min and max values of the time data (horizontal axis).
-        if (val.x() < min_x)
+        if (val->x() < min_x)
         {
-            min_x = val.x();
+            min_x = val->x();
         }
 
-        if (val.x() > max_x)
+        if (val->x() > max_x)
         {
-            max_x = val.x();
+            max_x = val->x();
         }
 
         // Find the min and max values of the CN0 data (vertical axis) if auto range is enabled.
         if (m_autoRangeEnabled)
         {
-            if (val.y() < min_y)
+            if (val->y() < min_y)
             {
-                min_y = val.y();
+                min_y = val->y();
             }
 
-            if (val.y() > max_y)
+            if (val->y() > max_y)
             {
-                max_y = val.y();
+                max_y = val->y();
             }
         }
     }
@@ -182,10 +183,10 @@ void Cn0Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
         max_y = min_y+1;
 
     // Map the real CN0 data to the sparkline coordinate system.
-    foreach (val, points)
+    for (const QPointF *val = points_begin; val != points_end; val ++)
     {
-        double x_in = val.x();
-        double y_in = val.y();
+        double x_in = val->x();
+        double y_in = val->y();
 
         double x_out = 0;
         double y_out = 0;
