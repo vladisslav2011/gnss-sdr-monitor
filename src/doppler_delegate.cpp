@@ -57,15 +57,8 @@ void DopplerDelegate::setBufferSize(int size)
 void DopplerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     const QModelIndex &index) const
 {
-    QList<QPointF> points;
+    QList<QPointF> points = index.data(Qt::DisplayRole).value<QList<QPointF>>();
     QVector<double> x_data, y_data;
-    QList<QVariant> var = index.data(Qt::DisplayRole).toList();
-    for (int i = 0; i < var.size(); i++)
-    {
-        points << var.at(i).toPointF();
-        x_data << var.at(i).toPointF().x();
-        y_data << var.at(i).toPointF().y();
-    }
 
     double min_x = std::numeric_limits<int>::max();
     double max_x = -std::numeric_limits<int>::max();
@@ -212,7 +205,7 @@ void DopplerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
     painter->translate(-hGap, -vGap);
 
     // Display value of the last Doppler sample next to the sparkline.
-    painter->drawText(textRect, QString::number(var.last().toPointF().y(), 'f', 1));
+    painter->drawText(textRect, QString::number(points.last().y(), 'f', 1));
 
     // Draw visual guides for debugging.
     //drawGuides(painter, cellRect, sparklineRect, textRect);

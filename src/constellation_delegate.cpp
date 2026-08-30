@@ -49,15 +49,8 @@ ConstellationDelegate::~ConstellationDelegate()
 void ConstellationDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     const QModelIndex &index) const
 {
-    QList<QPointF> points;
+    QList<QPointF> points = index.data(Qt::DisplayRole).value<QList<QPointF>>();
     QVector<double> x_data, y_data;
-    QList<QVariant> var = index.data(Qt::DisplayRole).toList();
-    for (int i = 0; i < var.size(); i++)
-    {
-        points << var.at(i).toPointF();
-        x_data << var.at(i).toPointF().x();
-        y_data << var.at(i).toPointF().y();
-    }
 
 
     double min_x = 0;

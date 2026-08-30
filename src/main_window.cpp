@@ -180,8 +180,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::updateChart(QtCharts::QChart *chart, QtCharts::QXYSeries *series, const QModelIndex &index)
 {
-    QPointF p;
-    QVector<QPointF> points;
+    QList<QPointF> points = index.data(Qt::DisplayRole).value<QList<QPointF>>();
 
     double min_x = std::numeric_limits<int>::max();
     double max_x = -std::numeric_limits<int>::max();
@@ -189,11 +188,9 @@ void MainWindow::updateChart(QtCharts::QChart *chart, QtCharts::QXYSeries *serie
     double min_y = std::numeric_limits<int>::max();
     double max_y = -std::numeric_limits<int>::max();
 
-    QList<QVariant> var = index.data(Qt::DisplayRole).toList();
-    for (int i = 0; i < var.size(); i++)
+    for (int i = 0; i < points.size(); i++)
     {
-        p = var.at(i).toPointF();
-        points << p;
+        const QPointF &p = points.at(i);
 
         min_x = std::min(min_x, p.x());
         min_y = std::min(min_y, p.y());

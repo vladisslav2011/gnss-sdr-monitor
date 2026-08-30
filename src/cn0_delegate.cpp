@@ -89,15 +89,8 @@ void Cn0Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
 {
     bool outOfScale = false;
 
-    QVector<QPointF> points;
+    QList<QPointF> points = index.data(Qt::DisplayRole).value<QList<QPointF>>();
     QVector<double> x_data, y_data;
-    QList<QVariant> var = index.data(Qt::DisplayRole).toList();
-    for (int i = 0; i < var.size(); i++)
-    {
-        points << var.at(i).toPointF();
-        x_data << var.at(i).toPointF().x();
-        y_data << var.at(i).toPointF().y();
-    }
 
     double min_x = std::numeric_limits<int>::max();
     double max_x = -std::numeric_limits<int>::max();
@@ -293,7 +286,7 @@ void Cn0Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     }
 
     // Get the value of the last CN0 smple.
-    double lastCN0 = var.last().toPointF().y();
+    double lastCN0 = points.last().y();
 
     // If the value of the last CN0 sample is outside of the designated scale use red color otherwise use black.
     if (lastCN0 < m_minCn0 || lastCN0 > m_maxCn0)
