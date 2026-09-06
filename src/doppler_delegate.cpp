@@ -97,6 +97,7 @@ void DopplerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
 
     QPointF val;
     QVector<QPointF> fpoints;
+    fpoints.append(QPointF(0,0));
     QStyledItemDelegate::paint(painter, option, index);
 
     if (points.isEmpty() || m_bufferSize < 1.0 || contentHeight <= 0)
@@ -183,9 +184,9 @@ void DopplerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
     painter->translate(offset.x() + hGap, offset.y() + vGap);
 
     // Fill area below the Doppler sparkline.
-    QPointF startPoint(fpoints.first().x(), contentHeight);
+    QPointF startPoint(fpoints[1].x(), contentHeight);
     QPointF endPoint(fpoints.last().x(), contentHeight);
-    fpoints.push_front(startPoint);
+    fpoints[0]=startPoint;
     fpoints.push_back(endPoint);
 
     QLinearGradient gradient(QPointF(0, 0), QPointF(0, contentHeight));
@@ -194,13 +195,11 @@ void DopplerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
 
     painter->setBrush(QBrush(gradient));
     painter->setPen(Qt::NoPen);
-    painter->drawPolygon(QPolygonF(fpoints));
+    painter->drawPolygon(&fpoints[0], fpoints.length());
 
     // Draw Doppler sparkline.
-    fpoints.removeFirst();
-    fpoints.removeLast();
     painter->setPen(Qt::black);
-    painter->drawPolyline(QPolygonF(fpoints));
+    painter->drawPolyline(&fpoints[1], fpoints.length() - 2);
 
     // Translate painting origin to cellOrigin.
     painter->translate(-hGap, -vGap);
