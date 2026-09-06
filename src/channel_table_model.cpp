@@ -93,9 +93,9 @@ QVariant ChannelTableModel::data(const QModelIndex &index, int role) const
         {
             int channel_id = m_channelsId.at(index.row());
 
-            gnss_sdr::GnssSynchro channel = m_channels.at(channel_id);
+            const gnss_sdr::GnssSynchro & channel = m_channels.at(channel_id);
 
-            QString channel_signal = m_channelsSignal.at(channel_id);
+            const QString & channel_signal = m_channelsSignal.at(channel_id);
 
             const boost::circular_buffer<double> & channel_time_cbuf =
                 m_channelsTime.at(channel_id);
