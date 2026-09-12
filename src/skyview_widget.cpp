@@ -146,13 +146,22 @@ void SkyViewWidget::draw(QPainter &painter)
     {
         qreal x = m_width * 0.5 + cos((p.az - 90)/ 180. * M_PI) * (90 - p.el) / 180. * sz;
         qreal y = m_height * 0.5 + sin((p.az - 90) / 180. * M_PI) * (90 - p.el) / 180. * sz;
-        int snr = std::max(20, std::min(255, static_cast<int>(std::floor((p.snr - 15.) * 235 / 35.))));
         p.x = x;
         p.y = y;
-        int red = p.snr > 0 ? 255 - snr : 99;
-        int green = p.snr > 0 ? snr : 99;
-        int blue = p.snr > 0 ? snr >> 4 : 99;
-        auto color = QColor(red, green, blue, 0xFF);
+        QColor color;
+        if(p.snr > 0)
+        {
+            if(12. > p.snr)
+                color = QColor(190, 190, 190, 255);      // gray
+            else if(30. > p.snr)
+                color = QColor(255, 0, 0, 255);          // red
+            else if(36. > p.snr)
+                color = QColor(255, 255, 0, 255);        // yellow
+            else if(42. > p.snr)
+                color = QColor(0, 205, 0, 255);          // green3
+            else
+                color = QColor(0, 255, 180, 255);        // green and some blue
+        }
         painter.setPen(QPen(color, 1, Qt::SolidLine));
         painter.setBrush(QBrush(color));
         painter.drawEllipse(QRectF(x-2,y-2,5,5));
