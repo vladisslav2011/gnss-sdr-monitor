@@ -114,7 +114,7 @@ QVariant ChannelTableModel::data(const QModelIndex &index, int role) const
                 switch (index.column())
                 {
                 case 0:
-                    return channel.channel_id();
+                    return QString::number(channel.channel_id()) + (m_used.find(channel_id) != m_used.end() ? "+" : "");
 
                 case 1:
                     return channel_signal;
@@ -297,10 +297,20 @@ QVariant ChannelTableModel::headerData(int section,
  */
 void ChannelTableModel::populateChannels(const gnss_sdr::Observables *stocks)
 {
+    std::set<int> new_active{};
+    std::set<int> new_good{};
     for (std::size_t i = 0; i < stocks->observable_size(); i++)
     {
         populateChannel(&stocks->observable(i));
+        if(stocks->observable(i).fs()!=0)
+        {
+            new_active.emplace(i);
+            if(stocks->observable(i).flag_valid_word())
+                new_good.emplace(i);
+        }
     }
+    m_active = new_active;
+    m_good = new_good;
 }
 
 /*!
@@ -393,7 +403,31 @@ void ChannelTableModel::populateChannel(const gnss_sdr::GnssSynchro *ch)
             // Map size has changed so record the new channel number in the vector of channel IDs.
             m_channelsId.push_back(ch->channel_id());
         }
+        m_sigChannel[toKey(ch->signal(),ch->prn())]=ch->channel_id();
     }
+}
+double ChannelTableModel::cn0(int prn, const std::string & signal)
+{
+    auto it = m_sigChannel.find(toKey(signal,prn));
+    if(it == m_sigChannel.end())
+        return 0;
+    return m_channelsCn0[it->second].at(m_channelsCn0[it->second].size() - 1);
+}
+
+void ChannelTableModel::clearUsed()
+{
+    m_used.clear();
+}
+
+void ChannelTableModel::setUsed(int prn, const std::string & signal, bool used)
+{
+    auto it = m_sigChannel.find(toKey(signal,prn));
+    if(it == m_sigChannel.end())
+        return;
+    if(used)
+        m_used.emplace(it->second);
+    else
+        m_used.erase(it->second);
 }
 
 /*!
@@ -425,6 +459,7 @@ void ChannelTableModel::clearChannels()
     m_channelsPromptQ.clear();
     m_channelsCn0.clear();
     m_channelsDoppler.clear();
+    m_sigChannel.clear();
 }
 
 /*!

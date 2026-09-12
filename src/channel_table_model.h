@@ -36,6 +36,9 @@
 
 #include "gnss_synchro.pb.h"
 #include <boost/circular_buffer.hpp>
+#include <set>
+#include <array>
+#include <utility>
 #include <QAbstractTableModel>
 
 class ChannelTableModel : public QAbstractTableModel
@@ -54,6 +57,11 @@ public:
     int getColumns();
     void setBufferSize();
     int getChannelId(int row);
+    double cn0(int prn, const std::string & signal);
+    void setUsed(int prn, const std::string & signal, bool used);
+    void clearUsed();
+    quint16 getActive() const { return m_active.size();}
+    quint16 getGood() const { return m_good.size();}
 
     // List of virtual functions that must be implemented in a read-only table model.
     int rowCount(const QModelIndex &parent) const;
@@ -77,6 +85,14 @@ protected:
     std::map<int, boost::circular_buffer<double>> m_channelsPromptQ;
     std::map<int, boost::circular_buffer<double>> m_channelsCn0;
     std::map<int, boost::circular_buffer<double>> m_channelsDoppler;
+    std::pair<std::array<char,2>,char> toKey(const std::string& sig, uint8_t prn)
+    {
+        return {std::array<char,2>({sig[0],sig[1]}),prn};
+    }
+    std::map<std::pair<std::array<char,2>,uint8_t>, int> m_sigChannel;
+    std::set<int> m_used;
+    std::set<int> m_active;
+    std::set<int> m_good;
 
 private:
     std::map<std::string, QString> m_mapSignalPrettyName;

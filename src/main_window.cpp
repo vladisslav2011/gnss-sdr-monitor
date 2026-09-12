@@ -53,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_updateTimer.setInterval(500);
     m_updateTimer.setSingleShot(true);
     connect(&m_updateTimer, &QTimer::timeout, [this] { m_model->update(); });
+    connect(&m_updateTimer, &QTimer::timeout, this, &MainWindow::updateTitle);
 
     ui->setupUi(this);
 
@@ -256,10 +257,12 @@ void MainWindow::receiveMonitorPvt()
         {
             m_monitorPvtWrapper->addMonitorPvt(m_monitorPvt);
             m_SkyViewWidget->clear();
+            m_model->clearUsed();
             for(int k=0;k<m_monitorPvt.used_satellites_size();k++)
             {
                 auto & s = m_monitorPvt.used_satellites(k);
-                m_SkyViewWidget->addData(s.prn(),s.azimuth_deg(),s.elevation_deg(),s.system(),s.signal(),s.combined(),40,0);
+                m_model->setUsed(s.prn(), s.signal(), true);
+                m_SkyViewWidget->addData(s.prn(),s.azimuth_deg(),s.elevation_deg(),s.system(),s.signal(),s.combined(),m_model->cn0(s.prn(),s.signal()),0);
             }
             // clear->setEnabled(true);
         }
@@ -575,6 +578,28 @@ void MainWindow::deletePlots()
         chartView->deleteLater();
     }
     m_plotsDoppler.clear();
+}
+
+void cmpUpdateFlag(quint16& a, const quint16 b, bool& f)
+{
+    if(a!=b)
+    {
+        a=b;
+        f=true;
+    }
+}
+
+void MainWindow::updateTitle()
+{
+    const auto satUsed=m_monitorPvt.used_satellites_size();
+    const auto satTracking=m_model->getActive();
+    const auto satGood=m_model->getGood();
+    bool doUpdate{false};
+    cmpUpdateFlag(m_satUsed, satUsed, doUpdate);
+    cmpUpdateFlag(m_satTracking, satTracking, doUpdate);
+    cmpUpdateFlag(m_satGood, satGood, doUpdate);
+    if(doUpdate)
+        setWindowTitle(QString("GNSS-SDR Monitor %1/%2T %3U").arg(m_satTracking).arg(m_satGood).arg(m_satUsed));
 }
 
 void MainWindow::about()

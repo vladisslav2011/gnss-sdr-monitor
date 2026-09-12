@@ -86,6 +86,7 @@ public slots:
     void expandPlot(const QModelIndex &index);
     void closePlots();
     void deletePlots();
+    void updateTitle();
     void about();
 
 protected:
@@ -119,6 +120,10 @@ private:
     std::vector<int> m_channels;
     quint16 m_portGnssSynchro;
     quint16 m_portMonitorPvt;
+    quint16 m_satUsed{0};
+    quint16 m_satTracking{0};
+    quint16 m_satGood{0};
+
     QSettings m_settings;
     QTimer m_updateTimer;
 
