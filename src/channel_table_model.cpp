@@ -460,6 +460,10 @@ void ChannelTableModel::clearChannels()
     m_channelsCn0.clear();
     m_channelsDoppler.clear();
     m_sigChannel.clear();
+    m_active.clear();
+    m_used.clear();
+    m_good.clear();
+    m_sigChannel.clear();
 }
 
 /*!
