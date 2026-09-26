@@ -67,6 +67,7 @@ void MonitorPvtWrapper::addMonitorPvt(const gnss_sdr::MonitorPvt &monitor_pvt)
     emit altitudeChanged(TOW_s, monitor_pvt.height());
     emit ppmChanged(TOW_s, monitor_pvt.user_clk_drift_ppm());
     emit dopChanged(TOW_s, monitor_pvt.gdop(), monitor_pvt.pdop(), monitor_pvt.hdop(), monitor_pvt.vdop());
+    emit ecefChanged(monitor_pvt.pos_x(), monitor_pvt.pos_y(), monitor_pvt.pos_z());
 }
 
 /*!

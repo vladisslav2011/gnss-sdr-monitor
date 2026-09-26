@@ -62,7 +62,7 @@ ChannelTableModel::ChannelTableModel()
     m_mapSignalPrettyName["J5"] = "L5";
     m_mapSignalPrettyName["I5"] = "I5";
 
-    m_columns = 11;
+    m_columns = 12;
     m_bufferSize = DEFAULT_BUFFER_SIZE;
 }
 
@@ -162,6 +162,8 @@ QVariant ChannelTableModel::data(const QModelIndex &index, int role) const
 
                 case 10:
                     return channel.pseudorange_m();
+                case 11:
+                    return qulonglong(channel.acq_samplestamp_samples());
                 }
             }
             else if (role == Qt::ToolTipRole)
@@ -199,6 +201,8 @@ QVariant ChannelTableModel::data(const QModelIndex &index, int role) const
                     return QVariant::Invalid;
 
                 case 10:
+                    return QVariant::Invalid;
+                case 11:
                     return QVariant::Invalid;
                 }
             }
@@ -285,6 +289,9 @@ QVariant ChannelTableModel::headerData(int section,
 
             case 10:
                 return "Pseudorange [m]";
+
+            case 11:
+                return "ACQ Stamp [samples]";
             }
         }
     }
