@@ -179,9 +179,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
-void MainWindow::updateChart(QtCharts::QChart *chart, QtCharts::QXYSeries *series, const QModelIndex &index)
+void MainWindow::updateChart(QtCharts::QChart *chart, QtCharts::QXYSeries *series, const int channel, const int column)
 {
-    const QVector<QPointF> &points = index.data(Qt::DisplayRole).value<QVector<QPointF>>();
+    const QVector<QPointF> &points = m_model->channel_index(channel, column).data(Qt::DisplayRole).value<QVector<QPointF>>();
+
+    chart->setTitle(m_model->headerData(column,Qt::Horizontal,Qt::DisplayRole).value<QString>() + " CH " + QString::number(channel) + 
+        " (" + m_model->channel_index(channel, 1).data(Qt::DisplayRole).value<QString>() +
+        " PRN" + m_model->channel_index(channel, 2).data(Qt::DisplayRole).value<QString>() +")");
 
     double min_x = std::numeric_limits<int>::max();
     double max_x = -std::numeric_limits<int>::max();
@@ -400,7 +404,7 @@ void MainWindow::expandPlot(const QModelIndex &index)
 
     if (index.column() == 5)  // Constellation
     {
-        if (m_plotsConstellation.find(index.row()) == m_plotsConstellation.end())
+        if (m_plotsConstellation.find(channel_id) == m_plotsConstellation.end())
         {
             QChart *chart = new QChart();  // has no parent!
             chart->setTitle("Constellation CH " + QString::number(channel_id));
@@ -420,30 +424,30 @@ void MainWindow::expandPlot(const QModelIndex &index)
             chartView->setContentsMargins(0, 0, 0, 0);
 
             // Draw chart now.
-            updateChart(chart, series, index);
+            updateChart(chart, series, channel_id, index.column());
 
             // Delete the chartView object when MainWindow is closed.
             connect(this, &QMainWindow::destroyed, chartView, &QObject::deleteLater);
 
             // Remove element from map when chartView widget is closed.
             connect(chartView, &QObject::destroyed,
-                [this, index]() { m_plotsConstellation.erase(index.row()); });
+                [this, channel_id]() { m_plotsConstellation.erase(channel_id); });
 
             // Update chart on timer timeout.
-            connect(&m_updateTimer, &QTimer::timeout, chart, [this, chart, series, index]() {
-                updateChart(chart, series, index);
+            connect(&m_updateTimer, &QTimer::timeout, chart, [this, chart, series, channel_id]() {
+                updateChart(chart, series, channel_id, 5);
             });
 
-            m_plotsConstellation[index.row()] = chartView;
+            m_plotsConstellation[channel_id] = chartView;
         }
         else
         {
-            chartView = m_plotsConstellation.at(index.row());
+            chartView = m_plotsConstellation.at(channel_id);
         }
     }
     else if (index.column() == 6)  // CN0
     {
-        if (m_plotsCn0.find(index.row()) == m_plotsCn0.end())
+        if (m_plotsCn0.find(channel_id) == m_plotsCn0.end())
         {
             QChart *chart = new QChart();  // has no parent!
             chart->setTitle("CN0 CH " + QString::number(channel_id));
@@ -462,30 +466,30 @@ void MainWindow::expandPlot(const QModelIndex &index)
             chartView->setContentsMargins(0, 0, 0, 0);
 
             // Draw chart now.
-            updateChart(chart, series, index);
+            updateChart(chart, series, channel_id, index.column());
 
             // Delete the chartView object when MainWindow is closed.
             connect(this, &QMainWindow::destroyed, chartView, &QObject::deleteLater);
 
             // Remove element from map when chartView widget is closed.
             connect(chartView, &QObject::destroyed,
-                [this, index]() { m_plotsCn0.erase(index.row()); });
+                [this, channel_id]() { m_plotsCn0.erase(channel_id); });
 
             // Update chart on timer timeout.
-            connect(&m_updateTimer, &QTimer::timeout, chart, [this, chart, series, index]() {
-                updateChart(chart, series, index);
+            connect(&m_updateTimer, &QTimer::timeout, chart, [this, chart, series, channel_id]() {
+                updateChart(chart, series, channel_id, 6);
             });
 
-            m_plotsCn0[index.row()] = chartView;
+            m_plotsCn0[channel_id] = chartView;
         }
         else
         {
-            chartView = m_plotsCn0.at(index.row());
+            chartView = m_plotsCn0.at(channel_id);
         }
     }
     else if (index.column() == 7)  // Doppler
     {
-        if (m_plotsDoppler.find(index.row()) == m_plotsDoppler.end())
+        if (m_plotsDoppler.find(channel_id) == m_plotsDoppler.end())
         {
             QChart *chart = new QChart();  // has no parent!
             chart->setTitle("Doppler CH " + QString::number(channel_id));
@@ -504,25 +508,25 @@ void MainWindow::expandPlot(const QModelIndex &index)
             chartView->setContentsMargins(0, 0, 0, 0);
 
             // Draw chart now.
-            updateChart(chart, series, index);
+            updateChart(chart, series, channel_id, index.column());
 
             // Delete the chartView object when MainWindow is closed.
             connect(this, &QMainWindow::destroyed, chartView, &QObject::deleteLater);
 
             // Remove element from map when chartView widget is closed.
             connect(chartView, &QObject::destroyed,
-                [this, index]() { m_plotsDoppler.erase(index.row()); });
+                [this, channel_id]() { m_plotsDoppler.erase(channel_id); });
 
             // Update chart on timer timeout.
-            connect(&m_updateTimer, &QTimer::timeout, chart, [this, chart, series, index]() {
-                updateChart(chart, series, index);
+            connect(&m_updateTimer, &QTimer::timeout, chart, [this, chart, series, channel_id]() {
+                updateChart(chart, series, channel_id, 7);
             });
 
-            m_plotsDoppler[index.row()] = chartView;
+            m_plotsDoppler[channel_id] = chartView;
         }
         else
         {
-            chartView = m_plotsDoppler.at(index.row());
+            chartView = m_plotsDoppler.at(channel_id);
         }
     }
 

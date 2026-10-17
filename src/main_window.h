@@ -93,7 +93,7 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private:
-    void updateChart(QtCharts::QChart *chart, QtCharts::QXYSeries *series, const QModelIndex &index);
+    void updateChart(QtCharts::QChart *chart, QtCharts::QXYSeries *series, const int channel, const int column);
 
     Ui::MainWindow *ui;
 

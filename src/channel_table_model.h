@@ -57,6 +57,17 @@ public:
     int getColumns();
     void setBufferSize();
     int getChannelId(int row);
+    QModelIndex channel_index(int channel, int column)
+    {
+        int row = 0;
+        for(row=0;row<m_channelsId.size();row++)
+            if(m_channelsId[row]==channel)
+                break;
+        if(row == m_channelsId.size())
+            return QModelIndex();
+        return index(row, column);
+    }
+
     double cn0(int prn, const std::string & signal);
     void setUsed(int prn, const std::string & signal, bool used);
     void clearUsed();
