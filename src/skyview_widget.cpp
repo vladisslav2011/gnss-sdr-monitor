@@ -171,6 +171,7 @@ void SkyViewWidget::draw(QPainter &painter)
     const qreal sz = m_clientSize - m_marg * 2.;
     const qreal circle_d = std::max(7., sz * 0.02);
     const qreal fontsz = std::max(m_fontSize, sz * 0.02);
+    static const QColor redColor = QColor(255,100,100,255);
     m_font.setPixelSize(fontsz);
     painter.setFont(m_font);
     auto paintItem=[&](int_data& p)
@@ -180,26 +181,23 @@ void SkyViewWidget::draw(QPainter &painter)
         p.x = x;
         p.y = y;
         QColor color;
-        if(p.snr > 0)
-        {
-            if(12. > p.snr)
-                color = QColor(190, 190, 190, 255);      // gray
-            else if(30. > p.snr)
-                color = QColor(255, 0, 0, 255);          // red
-            else if(36. > p.snr)
-                color = QColor(255, 255, 0, 255);        // yellow
-            else if(42. > p.snr)
-                color = QColor(0, 205, 0, 255);          // green3
-            else
-                color = QColor(0, 255, 180, 255);        // green and some blue
-        }
+        if(12. > p.snr)
+            color = QColor(190, 190, 190, 255);      // gray
+        else if(30. > p.snr)
+            color = QColor(255, 0, 0, 255);          // red
+        else if(36. > p.snr)
+            color = QColor(255, 255, 0, 255);        // yellow
+        else if(42. > p.snr)
+            color = QColor(0, 205, 0, 255);          // green3
+        else
+            color = QColor(0, 255, 180, 255);        // green and some blue
         painter.setPen(QPen(color, 1, Qt::SolidLine));
         painter.setBrush(p.used ? QBrush(color) : QBrush(QColor(0,0,0,0)));
         painter.drawEllipse(QRectF(x-circle_d*0.5,y-circle_d*0.5,circle_d,circle_d));
         painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
         painter.drawText(x - fontsz * 0.5 - 1, y + fontsz * 1.5 - 1, QString::fromStdString(p.System) + QString::number(p.prn) );
         painter.drawText(x - fontsz * 0.5 + 1, y + fontsz * 1.5 + 1, QString::fromStdString(p.System) + QString::number(p.prn) );
-        painter.setPen(QPen(p.healthy ? Qt::white : Qt::red, 1, Qt::SolidLine));
+        painter.setPen(QPen(p.healthy ? Qt::white : redColor, 1, Qt::SolidLine));
         painter.drawText(x - fontsz * 0.5, y + fontsz * 1.5, QString::fromStdString(p.System) + QString::number(p.prn) );
     };
     int_data * top_item{};
