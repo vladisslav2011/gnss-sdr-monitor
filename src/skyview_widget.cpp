@@ -72,9 +72,20 @@ QSize SkyViewWidget::sizeHint() const
 /*!
  Adds the new point to the widget's internal data structures.
  */
-void SkyViewWidget::addData(int prn, qreal az, qreal el, std::string System, std::string Signal, bool combined, qreal snr, int channel)
+void SkyViewWidget::addData(int prn, qreal az, qreal el, std::string System, std::string Signal, bool combined, qreal snr, int channel, bool used, bool healthy)
 {
-    m_items.push_back({prn,az,el,System, Signal, combined,snr, channel});
+    auto key = std::pair<std::string,int>(Signal, prn);
+    auto it = m_items.find(key);
+    if(it!=m_items.end())
+    {
+        it->second.az=az;
+        it->second.el=el;
+        it->second.snr=snr;
+        it->second.used=used;
+        it->second.healthy=healthy;
+        it->second.isRefreshed=true;
+    }else
+        m_items.emplace(key,int_data{prn,az,el,System, Signal, combined,snr, channel, used, healthy, true});
 }
 
 /*!
@@ -91,11 +102,28 @@ void SkyViewWidget::redraw()
 void SkyViewWidget::clear()
 {
     m_items.clear();
+    update();
+}
+
+void SkyViewWidget::startUpdate()
+{
+    for(auto it = m_items.begin(); it!=m_items.end();it++)
+        it->second.isRefreshed = false;
+}
+
+void SkyViewWidget::finishUpdate()
+{
+    for(auto it = m_items.cbegin(); it!=m_items.cend();)
+        if(!it->second.isRefreshed)
+            m_items.erase(it++);
+        else
+            it++;
 }
 
 void SkyViewWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
+    painter.fillRect(rect(),Qt::black);
     m_width = width();
     m_height = height();
     m_clientSize = std::min(m_width, m_height);
@@ -114,14 +142,14 @@ void SkyViewWidget::mouseMoveEvent(QMouseEvent* event)
     int_data * p = nullptr;
     int min_dist = 1000000;
 
-    for( auto & it: m_items)
-        if(isPointCloseTo(pt,it.x,it.y,5))
+    for( auto& it: m_items)
+        if(isPointCloseTo(pt,it.second.x,it.second.y,10))
         {
-            int dist=std::min(std::abs(pt.x()-it.x),std::abs(pt.y()-it.y));
+            int dist=std::min(std::abs(pt.x()-it.second.x),std::abs(pt.y()-it.second.y));
             if(dist<min_dist)
             {
                 min_dist = dist;
-                p = & it;
+                p = & it.second;
             }
         }
 
@@ -134,15 +162,18 @@ void SkyViewWidget::mouseMoveEvent(QMouseEvent* event)
                     + "\n" + "CH: " + QString::number(p->channel)
                     ;
         showToolTip(event, txt);
+        m_top_item = std::pair<std::string,int>(p->Signal,p->prn);
     }
 }
 
 void SkyViewWidget::draw(QPainter &painter)
 {
     const qreal sz = m_clientSize - m_marg * 2.;
-    m_font.setPixelSize(m_fontSize);
+    const qreal circle_d = std::max(7., sz * 0.02);
+    const qreal fontsz = std::max(m_fontSize, sz * 0.02);
+    m_font.setPixelSize(fontsz);
     painter.setFont(m_font);
-    for( auto & p: m_items)
+    auto paintItem=[&](int_data& p)
     {
         qreal x = m_width * 0.5 + cos((p.az - 90)/ 180. * M_PI) * (90 - p.el) / 180. * sz;
         qreal y = m_height * 0.5 + sin((p.az - 90) / 180. * M_PI) * (90 - p.el) / 180. * sz;
@@ -163,22 +194,32 @@ void SkyViewWidget::draw(QPainter &painter)
                 color = QColor(0, 255, 180, 255);        // green and some blue
         }
         painter.setPen(QPen(color, 1, Qt::SolidLine));
-        painter.setBrush(QBrush(color));
-        painter.drawEllipse(QRectF(x-2,y-2,5,5));
-        painter.setPen(QPen(Qt::white, 1, Qt::SolidLine));
-        painter.drawText(x - m_fontSize * 0.5 - 1, y + m_fontSize * 1.5 - 1, QString::fromStdString(p.System) + QString::number(p.prn) );
-        painter.drawText(x - m_fontSize * 0.5 + 1, y + m_fontSize * 1.5 + 1, QString::fromStdString(p.System) + QString::number(p.prn) );
+        painter.setBrush(p.used ? QBrush(color) : QBrush(QColor(0,0,0,0)));
+        painter.drawEllipse(QRectF(x-circle_d*0.5,y-circle_d*0.5,circle_d,circle_d));
         painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-        painter.drawText(x - m_fontSize * 0.5, y + m_fontSize * 1.5, QString::fromStdString(p.System) + QString::number(p.prn) );
-        
-        
+        painter.drawText(x - fontsz * 0.5 - 1, y + fontsz * 1.5 - 1, QString::fromStdString(p.System) + QString::number(p.prn) );
+        painter.drawText(x - fontsz * 0.5 + 1, y + fontsz * 1.5 + 1, QString::fromStdString(p.System) + QString::number(p.prn) );
+        painter.setPen(QPen(p.healthy ? Qt::white : Qt::red, 1, Qt::SolidLine));
+        painter.drawText(x - fontsz * 0.5, y + fontsz * 1.5, QString::fromStdString(p.System) + QString::number(p.prn) );
+    };
+    int_data * top_item{};
+    for( auto& it: m_items)
+    {
+        if(it.first == m_top_item)
+        {
+            top_item=&it.second;
+            continue;
+        }
+        paintItem(it.second);
     }
+    if(top_item)
+        paintItem(*top_item);
 }
 
 void SkyViewWidget::drawOverlay(QPainter &painter)
 {
     const qreal sz = m_clientSize - m_marg * 2.;
-    painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+    painter.setPen(QPen(Qt::white, 1, Qt::SolidLine));
     painter.drawLine(QLineF(m_leftMargin + m_marg, m_height * 0.5, m_width - m_leftMargin - m_marg, m_height * 0.5));        // H line
     painter.drawLine(QLineF(m_width * 0.5, m_topMargin + m_marg, m_width * 0.5, m_height - m_topMargin - m_marg));    // V line
     painter.drawEllipse(QRectF(m_leftMargin + m_marg, m_topMargin + m_marg, sz, sz));    // outer circle

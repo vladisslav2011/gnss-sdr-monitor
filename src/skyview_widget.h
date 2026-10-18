@@ -36,6 +36,7 @@
 
 #include <QtGui>
 #include <QFrame>
+#include <map>
 
 class SkyViewWidget : public QFrame
 {
@@ -47,9 +48,11 @@ public:
     QSize sizeHint() const;
 
 public slots:
-    void addData(int prn, qreal az, qreal el, std::string System, std::string Signal, bool combined, qreal snr, int channel);
+    void addData(int prn, qreal az, qreal el, std::string System, std::string Signal, bool combined, qreal snr, int channel, bool used, bool healthy);
     void redraw();
     void clear();
+    void startUpdate();
+    void finishUpdate();
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -66,6 +69,9 @@ private:
         bool combined;
         qreal snr;
         int channel;
+        bool used;
+        bool healthy;
+        bool isRefreshed;
         qreal x;
         qreal y;
     };
@@ -77,7 +83,8 @@ private:
     }
     void showToolTip(QMouseEvent* event, QString toolTipText);
 
-    QList<int_data> m_items{};
+    std::map<std::pair<std::string,int>,int_data> m_items{};
+    std::pair<std::string,int> m_top_item{};
     QFont   m_font;
     qreal   m_fontSize{0};
     qreal   m_topMargin{0};

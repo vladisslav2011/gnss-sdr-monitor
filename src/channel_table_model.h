@@ -69,6 +69,7 @@ public:
     }
 
     double cn0(int prn, const std::string & signal);
+    int channel(int prn, const std::string & signal);
     void setUsed(int prn, const std::string & signal, bool used);
     void clearUsed();
     quint16 getActive() const { return m_active.size();}

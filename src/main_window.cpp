@@ -260,14 +260,15 @@ void MainWindow::receiveMonitorPvt()
         if (m_stop->isEnabled())
         {
             m_monitorPvtWrapper->addMonitorPvt(m_monitorPvt);
-            m_SkyViewWidget->clear();
+            m_SkyViewWidget->startUpdate();
             m_model->clearUsed();
             for(int k=0;k<m_monitorPvt.used_satellites_size();k++)
             {
                 auto & s = m_monitorPvt.used_satellites(k);
                 m_model->setUsed(s.prn(), s.signal(), true);
-                m_SkyViewWidget->addData(s.prn(),s.azimuth_deg(),s.elevation_deg(),s.system(),s.signal(),s.combined(),m_model->cn0(s.prn(),s.signal()),0);
+                m_SkyViewWidget->addData(s.prn(),s.azimuth_deg(),s.elevation_deg(),s.system(),s.signal(),s.combined(),m_model->cn0(s.prn(),s.signal()), m_model->channel(s.prn(),s.signal()), s.used(), s.healthy());
             }
+            m_SkyViewWidget->finishUpdate();
             // clear->setEnabled(true);
         }
     }

@@ -65,6 +65,8 @@ message MonitorPvt {
     double azimuth_deg = 4;
     double elevation_deg = 5;
     bool combined = 6;
+    bool used = 7;
+    bool healthy = 8;
   }
   repeated UsedSatellite used_satellites = 37;
 }

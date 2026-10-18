@@ -413,12 +413,21 @@ void ChannelTableModel::populateChannel(const gnss_sdr::GnssSynchro *ch)
         m_sigChannel[toKey(ch->signal(),ch->prn())]=ch->channel_id();
     }
 }
+
 double ChannelTableModel::cn0(int prn, const std::string & signal)
 {
     auto it = m_sigChannel.find(toKey(signal,prn));
     if(it == m_sigChannel.end())
         return 0;
     return m_channelsCn0[it->second].at(m_channelsCn0[it->second].size() - 1);
+}
+
+int ChannelTableModel::channel(int prn, const std::string & signal)
+{
+    auto it = m_sigChannel.find(toKey(signal,prn));
+    if(it == m_sigChannel.end())
+        return -1;
+    return it->second;
 }
 
 void ChannelTableModel::clearUsed()
