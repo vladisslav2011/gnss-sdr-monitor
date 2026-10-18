@@ -82,6 +82,7 @@ void SkyViewWidget::addData(int prn, qreal az, qreal el, std::string System, std
         it->second.el=el;
         it->second.snr=snr;
         it->second.used=used;
+        it->second.channel=channel;
         it->second.healthy=healthy;
         it->second.isRefreshed=true;
     }else
