@@ -71,8 +71,11 @@ ChannelTableModel::ChannelTableModel()
  */
 void ChannelTableModel::update()
 {
-    beginResetModel();
-    endResetModel();
+    if(m_changed)
+    {
+        emit dataChanged(createIndex(0,0),createIndex(11,m_channels.size()-1));
+        m_changed=false;
+    }
 }
 
 int ChannelTableModel::rowCount(const QModelIndex &parent) const
@@ -306,6 +309,7 @@ void ChannelTableModel::populateChannels(const gnss_sdr::Observables *stocks)
 {
     std::set<int> new_active{};
     std::set<int> new_good{};
+    int oldN = m_channels.size();
     for (std::size_t i = 0; i < stocks->observable_size(); i++)
     {
         populateChannel(&stocks->observable(i));
@@ -316,8 +320,14 @@ void ChannelTableModel::populateChannels(const gnss_sdr::Observables *stocks)
                 new_good.emplace(i);
         }
     }
+    if(m_channels.size() > oldN)
+    {
+        beginInsertRows(QModelIndex(),oldN,m_channels.size()-1);
+        endInsertRows();
+    }
     m_active = new_active;
     m_good = new_good;
+    m_changed = true;
 }
 
 /*!
@@ -467,6 +477,7 @@ void ChannelTableModel::clearChannel(int ch_id)
  */
 void ChannelTableModel::clearChannels()
 {
+    beginResetModel();
     m_channelsId.clear();
     m_channels.clear();
     m_channelsSignal.clear();
@@ -480,6 +491,7 @@ void ChannelTableModel::clearChannels()
     m_used.clear();
     m_good.clear();
     m_sigChannel.clear();
+    endResetModel();
 }
 
 /*!
@@ -569,7 +581,18 @@ void ChannelTableModel::setBufferSize()
 /*!
  Gets the id number of the channel occupying the queried \a row of the table model.
  */
-int ChannelTableModel::getChannelId(int row)
+int ChannelTableModel::getChannelId(int row) const
 {
     return m_channelsId.at(row);
+}
+
+QModelIndex ChannelTableModel::channel_index(int channel, int column) const
+{
+    int row = 0;
+    for(row=0;row<m_channelsId.size();row++)
+        if(m_channelsId[row]==channel)
+            break;
+    if(row == m_channelsId.size())
+        return QModelIndex();
+    return index(row, column);
 }

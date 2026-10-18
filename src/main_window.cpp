@@ -262,11 +262,13 @@ void MainWindow::receiveMonitorPvt()
             m_monitorPvtWrapper->addMonitorPvt(m_monitorPvt);
             m_SkyViewWidget->startUpdate();
             m_model->clearUsed();
+            m_usedSat = 0;
             for(int k=0;k<m_monitorPvt.used_satellites_size();k++)
             {
                 auto & s = m_monitorPvt.used_satellites(k);
                 m_model->setUsed(s.prn(), s.signal(), true);
                 m_SkyViewWidget->addData(s.prn(),s.azimuth_deg(),s.elevation_deg(),s.system(),s.signal(),s.combined(),m_model->cn0(s.prn(),s.signal()), m_model->channel(s.prn(),s.signal()), s.used(), s.healthy());
+                m_usedSat += s.used()?1:0;
             }
             m_SkyViewWidget->finishUpdate();
             // clear->setEnabled(true);
@@ -283,6 +285,7 @@ void MainWindow::clearEntries()
     m_ppmWidget->clear();
     m_DOPWidget->clear();
     m_SkyViewWidget->clear();
+    m_usedSat = 0;
 
     m_clear->setEnabled(false);
 }
@@ -397,7 +400,7 @@ void MainWindow::setPreferences()
 
 void MainWindow::expandPlot(const QModelIndex &index)
 {
-    qDebug() << index;
+    // qDebug() << index;
 
     int channel_id = m_model->getChannelId(index.row());
 
@@ -596,7 +599,7 @@ void cmpUpdateFlag(quint16& a, const quint16 b, bool& f)
 
 void MainWindow::updateTitle()
 {
-    const auto satUsed=m_monitorPvt.used_satellites_size();
+    const auto satUsed=m_usedSat;
     const auto satTracking=m_model->getActive();
     const auto satGood=m_model->getGood();
     bool doUpdate{false};

@@ -123,6 +123,7 @@ private:
     quint16 m_satUsed{0};
     quint16 m_satTracking{0};
     quint16 m_satGood{0};
+    quint16 m_usedSat{0};
 
     QSettings m_settings;
     QTimer m_updateTimer;

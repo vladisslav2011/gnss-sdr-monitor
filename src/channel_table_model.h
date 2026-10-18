@@ -49,25 +49,14 @@ public:
     void update();
 
     void populateChannels(const gnss_sdr::Observables *m_stocks);
-    void populateChannel(const gnss_sdr::GnssSynchro *ch);
     void clearChannel(int ch_id);
     void clearChannels();
     QString getSignalPrettyName(const gnss_sdr::GnssSynchro *ch);
     QList<QVariant> getListFromCbuf(boost::circular_buffer<double> cbuf);
     int getColumns();
     void setBufferSize();
-    int getChannelId(int row);
-    QModelIndex channel_index(int channel, int column)
-    {
-        int row = 0;
-        for(row=0;row<m_channelsId.size();row++)
-            if(m_channelsId[row]==channel)
-                break;
-        if(row == m_channelsId.size())
-            return QModelIndex();
-        return index(row, column);
-    }
-
+    int getChannelId(int row) const;
+    QModelIndex channel_index(int channel, int column) const;
     double cn0(int prn, const std::string & signal);
     int channel(int prn, const std::string & signal);
     void setUsed(int prn, const std::string & signal, bool used);
@@ -105,8 +94,10 @@ protected:
     std::set<int> m_used;
     std::set<int> m_active;
     std::set<int> m_good;
+    bool m_changed{};
 
 private:
+    void populateChannel(const gnss_sdr::GnssSynchro *ch);
     std::map<std::string, QString> m_mapSignalPrettyName;
 };
 
