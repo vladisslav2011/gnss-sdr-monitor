@@ -307,17 +307,15 @@ QVariant ChannelTableModel::headerData(int section,
  */
 void ChannelTableModel::populateChannels(const gnss_sdr::Observables *stocks)
 {
-    std::set<int> new_active{};
-    std::set<int> new_good{};
     int oldN = m_channels.size();
     for (std::size_t i = 0; i < stocks->observable_size(); i++)
     {
         populateChannel(&stocks->observable(i));
         if(stocks->observable(i).fs()!=0)
         {
-            new_active.emplace(i);
+            m_new_active.emplace(stocks->observable(i).channel_id());
             if(stocks->observable(i).flag_valid_word())
-                new_good.emplace(i);
+                m_new_good.emplace(stocks->observable(i).channel_id());
         }
     }
     if(m_channels.size() > oldN)
@@ -325,8 +323,13 @@ void ChannelTableModel::populateChannels(const gnss_sdr::Observables *stocks)
         beginInsertRows(QModelIndex(),oldN,m_channels.size()-1);
         endInsertRows();
     }
-    m_active = new_active;
-    m_good = new_good;
+    if(!m_changed)
+    {
+        m_active = std::move(m_new_active);
+        m_good = std::move(m_new_good);
+        //m_new_active.clear();
+        //m_new_good.clear();
+    }
     m_changed = true;
 }
 
@@ -420,24 +423,44 @@ void ChannelTableModel::populateChannel(const gnss_sdr::GnssSynchro *ch)
             // Map size has changed so record the new channel number in the vector of channel IDs.
             m_channelsId.push_back(ch->channel_id());
         }
-        m_sigChannel[toKey(ch->signal(),ch->prn())]=ch->channel_id();
+        std::array<char,2> sig({ch->signal()[0],ch->signal()[1]});
+        m_system_signal[ch->system()[0]].emplace(sig);
+        m_sigChannel[ch->prn()][sig]=ch->channel_id();
     }
 }
 
-double ChannelTableModel::cn0(int prn, const std::string & signal)
+double ChannelTableModel::cn0(int prn, const std::string & signal, const char system)
 {
-    auto it = m_sigChannel.find(toKey(signal,prn));
-    if(it == m_sigChannel.end())
+    int ch = channel(prn,signal,system);
+    if(ch<0)
         return 0;
-    return m_channelsCn0[it->second].at(m_channelsCn0[it->second].size() - 1);
+    return m_channelsCn0[ch].at(m_channelsCn0[ch].size() - 1);
 }
 
-int ChannelTableModel::channel(int prn, const std::string & signal)
+int ChannelTableModel::channel(int prn, const std::string & signal, const char system)
 {
-    auto it = m_sigChannel.find(toKey(signal,prn));
+    auto it = m_sigChannel.find(prn);
     if(it == m_sigChannel.end())
         return -1;
-    return it->second;
+    std::array<char,2> sig({signal[0],signal[1]});
+    auto it1 = it->second.find(sig);
+    if(it1 == it->second.end())
+    {
+        auto sys_sig = m_system_signal.find(system);
+        if(sys_sig == m_system_signal.end())
+            return -1;
+        for(auto sigs:sys_sig->second)
+        {
+            it1 = it->second.find(sigs);
+            if(it1 != it->second.end())
+                break;
+        }
+        if(it1 == it->second.end())
+            return -1;
+    }
+    if(m_active.find(it1->second) == m_active.end())
+        return -1;
+    return it1->second;
 }
 
 void ChannelTableModel::clearUsed()
@@ -447,13 +470,13 @@ void ChannelTableModel::clearUsed()
 
 void ChannelTableModel::setUsed(int prn, const std::string & signal, bool used)
 {
-    auto it = m_sigChannel.find(toKey(signal,prn));
-    if(it == m_sigChannel.end())
+    int ch = channel(prn, signal,'\0');
+    if(ch < 0)
         return;
     if(used)
-        m_used.emplace(it->second);
+        m_used.emplace(ch);
     else
-        m_used.erase(it->second);
+        m_used.erase(ch);
 }
 
 /*!
@@ -490,7 +513,6 @@ void ChannelTableModel::clearChannels()
     m_active.clear();
     m_used.clear();
     m_good.clear();
-    m_sigChannel.clear();
     endResetModel();
 }
 

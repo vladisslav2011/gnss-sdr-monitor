@@ -266,8 +266,8 @@ void MainWindow::receiveMonitorPvt()
             for(int k=0;k<m_monitorPvt.used_satellites_size();k++)
             {
                 auto & s = m_monitorPvt.used_satellites(k);
-                m_model->setUsed(s.prn(), s.signal(), true);
-                m_SkyViewWidget->addData(s.prn(),s.azimuth_deg(),s.elevation_deg(),s.system(),s.signal(),s.combined(),m_model->cn0(s.prn(),s.signal()), m_model->channel(s.prn(),s.signal()), s.used(), s.healthy());
+                m_model->setUsed(s.prn(), s.signal(), s.used());
+                m_SkyViewWidget->addData(s.prn(),s.azimuth_deg(),s.elevation_deg(),s.system(),s.signal(),s.combined(),m_model->cn0(s.prn(),s.signal(), s.system()[0]), m_model->channel(s.prn(),s.signal(),s.system()[0]), s.used(), s.healthy());
                 m_usedSat += s.used()?1:0;
             }
             m_SkyViewWidget->finishUpdate();

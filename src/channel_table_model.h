@@ -57,8 +57,8 @@ public:
     void setBufferSize();
     int getChannelId(int row) const;
     QModelIndex channel_index(int channel, int column) const;
-    double cn0(int prn, const std::string & signal);
-    int channel(int prn, const std::string & signal);
+    double cn0(int prn, const std::string & signal, const char system);
+    int channel(int prn, const std::string & signal, const char system);
     void setUsed(int prn, const std::string & signal, bool used);
     void clearUsed();
     quint16 getActive() const { return m_active.size();}
@@ -86,14 +86,13 @@ protected:
     std::map<int, boost::circular_buffer<double>> m_channelsPromptQ;
     std::map<int, boost::circular_buffer<double>> m_channelsCn0;
     std::map<int, boost::circular_buffer<double>> m_channelsDoppler;
-    std::pair<std::array<char,2>,char> toKey(const std::string& sig, uint8_t prn)
-    {
-        return {std::array<char,2>({sig[0],sig[1]}),prn};
-    }
-    std::map<std::pair<std::array<char,2>,uint8_t>, int> m_sigChannel;
+    std::map<uint8_t, std::map<std::array<char,2>,int>> m_sigChannel;
+    std::map<char, std::set<std::array<char,2>>> m_system_signal;
     std::set<int> m_used;
     std::set<int> m_active;
+    std::set<int> m_new_active;
     std::set<int> m_good;
+    std::set<int> m_new_good;
     bool m_changed{};
 
 private:
