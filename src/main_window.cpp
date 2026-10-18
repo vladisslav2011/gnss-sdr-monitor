@@ -426,16 +426,14 @@ void MainWindow::expandPlot(const QModelIndex &index)
             chartView = new QChartView(chart);
             chartView->setRenderHint(QPainter::Antialiasing);
             chartView->setContentsMargins(0, 0, 0, 0);
+            chartView->setAttribute(Qt::WA_DeleteOnClose, true);
 
             // Draw chart now.
             updateChart(chart, series, channel_id, index.column());
 
-            // Delete the chartView object when MainWindow is closed.
-            connect(this, &QMainWindow::destroyed, chartView, &QObject::deleteLater);
-
             // Remove element from map when chartView widget is closed.
             connect(chartView, &QObject::destroyed,
-                [this, channel_id]() { m_plotsConstellation.erase(channel_id); });
+                [this, channel_id, chartView]() { m_plotsConstellation.erase(channel_id); chartView->deleteLater(); });
 
             // Update chart on timer timeout.
             connect(&m_updateTimer, &QTimer::timeout, chart, [this, chart, series, channel_id]() {
@@ -468,16 +466,14 @@ void MainWindow::expandPlot(const QModelIndex &index)
             chartView = new QChartView(chart);
             chartView->setRenderHint(QPainter::Antialiasing);
             chartView->setContentsMargins(0, 0, 0, 0);
+            chartView->setAttribute(Qt::WA_DeleteOnClose, true);
 
             // Draw chart now.
             updateChart(chart, series, channel_id, index.column());
 
-            // Delete the chartView object when MainWindow is closed.
-            connect(this, &QMainWindow::destroyed, chartView, &QObject::deleteLater);
-
             // Remove element from map when chartView widget is closed.
             connect(chartView, &QObject::destroyed,
-                [this, channel_id]() { m_plotsCn0.erase(channel_id); });
+                [this, channel_id, chartView]() { m_plotsCn0.erase(channel_id); chartView->deleteLater(); });
 
             // Update chart on timer timeout.
             connect(&m_updateTimer, &QTimer::timeout, chart, [this, chart, series, channel_id]() {
@@ -514,12 +510,9 @@ void MainWindow::expandPlot(const QModelIndex &index)
             // Draw chart now.
             updateChart(chart, series, channel_id, index.column());
 
-            // Delete the chartView object when MainWindow is closed.
-            connect(this, &QMainWindow::destroyed, chartView, &QObject::deleteLater);
-
             // Remove element from map when chartView widget is closed.
             connect(chartView, &QObject::destroyed,
-                [this, channel_id]() { m_plotsDoppler.erase(channel_id); });
+                [this, channel_id, chartView]() { m_plotsDoppler.erase(channel_id);  chartView->deleteLater(); });
 
             // Update chart on timer timeout.
             connect(&m_updateTimer, &QTimer::timeout, chart, [this, chart, series, channel_id]() {
