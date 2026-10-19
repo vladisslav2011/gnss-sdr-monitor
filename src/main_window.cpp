@@ -106,6 +106,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_SkyViewDockWidget->setWidget(m_SkyViewWidget);
     addDockWidget(Qt::TopDockWidgetArea, m_SkyViewDockWidget);
     connect(&m_updateTimer, &QTimer::timeout, m_SkyViewWidget, &SkyViewWidget::redraw);
+    connect(m_SkyViewWidget,&SkyViewWidget::satSelected,m_SkyViewWidget,&SkyViewWidget::selectSat);
 
     // QMenuBar.
     ui->actionQuit->setIcon(QIcon::fromTheme("application-exit"));
@@ -163,8 +164,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_socketMonitorPvt, &QUdpSocket::readyRead, this, &MainWindow::receiveMonitorPvt);
     connect(qApp, &QApplication::aboutToQuit, this, &MainWindow::quit);
     connect(ui->tableView, &QTableView::clicked, this, &MainWindow::expandPlot);
+    connect(ui->tableView, &QTableView::activated, this, &MainWindow::expandPlot);
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::about);
     connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
+    connect(m_SkyViewWidget,&SkyViewWidget::satSelected,m_model,&ChannelTableModel::selectSat);
 
     // Load settings from last session.
     loadSettings();
@@ -406,9 +409,16 @@ void MainWindow::expandPlot(const QModelIndex &index)
 
     QChartView *chartView = nullptr;
 
-    if (index.column() == 5)  // Constellation
+    if (index.column() < 5)
     {
-        if (m_plotsConstellation.find(channel_id) == m_plotsConstellation.end())
+        std::string sig = m_model->getSignal(channel_id);
+        uint32_t prn = m_model->getPrn(channel_id);
+        m_model->selectSat(prn,sig);
+        m_SkyViewWidget->selectSat(prn,sig);
+    }
+    else if (index.column() == 5)  // Constellation
+    {
+       if (m_plotsConstellation.find(channel_id) == m_plotsConstellation.end())
         {
             QChart *chart = new QChart();  // has no parent!
             chart->setTitle("Constellation CH " + QString::number(channel_id));

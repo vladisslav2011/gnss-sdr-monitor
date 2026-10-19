@@ -246,6 +246,21 @@ QVariant ChannelTableModel::data(const QModelIndex &index, int role) const
     else if (role == Qt::TextAlignmentRole)
     {
         return Qt::AlignCenter;
+    }else if (role == Qt::BackgroundRole)
+    {
+            int channel_id = m_channelsId.at(index.row());
+
+            const gnss_sdr::GnssSynchro & channel = m_channels.at(channel_id);
+            const bool isUsed=m_used.find(channel_id) != m_used.end();
+            const bool isSelected = channel.prn() == m_sel_item.second && channel.signal() == m_sel_item.first;
+            if(!isUsed && !isSelected)
+                return QVariant::Invalid;
+            if(isUsed && isSelected)
+                return QBrush(QColor(200, 255, 255, 255));
+            if(isUsed)
+                return QBrush(QColor(230, 255, 230, 255));
+            if(isSelected)
+                return QBrush(QColor(200, 200, 255, 255));
     }
     return QVariant::Invalid;
 }
@@ -622,4 +637,26 @@ QModelIndex ChannelTableModel::channel_index(int channel, int column) const
     if(row == m_channelsId.size())
         return QModelIndex();
     return index(row, column);
+}
+
+void ChannelTableModel::selectSat(uint32_t prn, std::string signal)
+{
+    m_sel_item = std::pair<std::string,uint32_t>(signal,prn);
+    emit dataChanged(createIndex(0,0),createIndex(11,m_channels.size()-1));
+}
+
+uint32_t ChannelTableModel::getPrn(int channelId) const
+{
+    auto it = m_channels.find(channelId);
+    if(it == m_channels.end())
+        return 0;
+    return it->second.prn();
+}
+
+const std::string ChannelTableModel::getSignal(int channelId) const
+{
+    auto it = m_channels.find(channelId);
+    if(it == m_channels.end())
+        return "";
+    return it->second.signal();
 }

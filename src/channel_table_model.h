@@ -63,6 +63,8 @@ public:
     void clearUsed();
     quint16 getActive() const { return m_active.size();}
     quint16 getGood() const { return m_good.size();}
+    uint32_t getPrn(int channelId) const;
+    const std::string getSignal(int channelId) const;
 
     // List of virtual functions that must be implemented in a read-only table model.
     int rowCount(const QModelIndex &parent) const;
@@ -72,6 +74,7 @@ public:
 
 public slots:
     gnss_sdr::GnssSynchro getChannelData(int key);
+    void selectSat(uint32_t prn, std::string signal);
 
 protected:
     int m_columns;
@@ -93,6 +96,7 @@ protected:
     std::set<int> m_new_active;
     std::set<int> m_good;
     std::set<int> m_new_good;
+    std::pair<std::string,uint32_t> m_sel_item{};
     bool m_changed{};
 
 private:

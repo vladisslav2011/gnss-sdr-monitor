@@ -121,6 +121,12 @@ void SkyViewWidget::finishUpdate()
             it++;
 }
 
+void SkyViewWidget::selectSat(uint32_t prn, std::string signal)
+{
+    m_sel_item = std::pair<std::string,uint32_t>(signal,prn);
+    redraw();
+}
+
 void SkyViewWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
@@ -167,6 +173,30 @@ void SkyViewWidget::mouseMoveEvent(QMouseEvent* event)
     }
 }
 
+void SkyViewWidget::mousePressEvent(QMouseEvent* event)
+{
+
+    QPoint pt = event->pos();
+    int_data * p = nullptr;
+    int min_dist = 1000000;
+
+    for( auto& it: m_items)
+        if(isPointCloseTo(pt,it.second.x,it.second.y,10))
+        {
+            int dist=std::min(std::abs(pt.x()-it.second.x),std::abs(pt.y()-it.second.y));
+            if(dist<min_dist)
+            {
+                min_dist = dist;
+                p = & it.second;
+            }
+        }
+
+    if(p)
+        emit satSelected(p->prn, p->Signal);
+    else
+        emit satSelected(0, "");
+}
+
 void SkyViewWidget::draw(QPainter &painter)
 {
     const qreal sz = m_clientSize - m_marg * 2.;
@@ -202,8 +232,11 @@ void SkyViewWidget::draw(QPainter &painter)
         painter.drawText(x - fontsz * 0.5, y + fontsz * 1.5, QString::fromStdString(p.System) + QString::number(p.prn) );
     };
     int_data * top_item{};
+    int_data * sel_item{};
     for(auto& it: m_items)
     {
+        if(it.first == m_sel_item)
+            sel_item=&it.second;
         if(it.first == m_top_item)
         {
             top_item=&it.second;
@@ -213,6 +246,14 @@ void SkyViewWidget::draw(QPainter &painter)
     }
     if(top_item)
         paintItem(*top_item);
+    if(sel_item)
+    {
+        //draw a pink cross
+        auto& p = *sel_item;
+        painter.setPen(QPen(QColor(255,0,255,255), 2, Qt::SolidLine));
+        painter.drawLine(QLineF(p.x - fontsz, p.y, p.x + fontsz, p.y));
+        painter.drawLine(QLineF(p.x, p.y - fontsz, p.x, p.y + fontsz));
+    }
 }
 
 void SkyViewWidget::drawOverlay(QPainter &painter)
