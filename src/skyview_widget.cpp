@@ -72,9 +72,9 @@ QSize SkyViewWidget::sizeHint() const
 /*!
  Adds the new point to the widget's internal data structures.
  */
-void SkyViewWidget::addData(int prn, qreal az, qreal el, std::string System, std::string Signal, bool combined, qreal snr, int channel, bool used, bool healthy)
+void SkyViewWidget::addData(uint32_t prn, qreal az, qreal el, std::string System, std::string Signal, bool combined, qreal snr, int channel, bool used, bool healthy)
 {
-    auto key = std::pair<std::string,int>(Signal, prn);
+    auto key = std::pair<std::string,uint32_t>(Signal, prn);
     auto it = m_items.find(key);
     if(it!=m_items.end())
     {
@@ -163,7 +163,7 @@ void SkyViewWidget::mouseMoveEvent(QMouseEvent* event)
                     + "\n" + "CH: " + QString::number(p->channel)
                     ;
         showToolTip(event, txt);
-        m_top_item = std::pair<std::string,int>(p->Signal,p->prn);
+        m_top_item = std::pair<std::string,uint32_t>(p->Signal,p->prn);
     }
 }
 
@@ -202,7 +202,7 @@ void SkyViewWidget::draw(QPainter &painter)
         painter.drawText(x - fontsz * 0.5, y + fontsz * 1.5, QString::fromStdString(p.System) + QString::number(p.prn) );
     };
     int_data * top_item{};
-    for( auto& it: m_items)
+    for(auto& it: m_items)
     {
         if(it.first == m_top_item)
         {

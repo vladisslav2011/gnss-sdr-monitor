@@ -48,7 +48,7 @@ public:
     QSize sizeHint() const;
 
 public slots:
-    void addData(int prn, qreal az, qreal el, std::string System, std::string Signal, bool combined, qreal snr, int channel, bool used, bool healthy);
+    void addData(uint32_t prn, qreal az, qreal el, std::string System, std::string Signal, bool combined, qreal snr, int channel, bool used, bool healthy);
     void redraw();
     void clear();
     void startUpdate();
@@ -61,7 +61,7 @@ protected:
 private:
     struct int_data
     {
-        int prn;
+        uint32_t prn;
         qreal az;
         qreal el;
         std::string System;
@@ -83,8 +83,8 @@ private:
     }
     void showToolTip(QMouseEvent* event, QString toolTipText);
 
-    std::map<std::pair<std::string,int>,int_data> m_items{};
-    std::pair<std::string,int> m_top_item{};
+    std::map<std::pair<std::string,uint32_t>,int_data> m_items{};
+    std::pair<std::string,uint32_t> m_top_item{};
     QFont   m_font;
     qreal   m_fontSize{0};
     qreal   m_topMargin{0};

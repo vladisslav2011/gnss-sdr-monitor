@@ -429,7 +429,7 @@ void ChannelTableModel::populateChannel(const gnss_sdr::GnssSynchro *ch)
     }
 }
 
-double ChannelTableModel::cn0(int prn, const std::string & signal, const char system)
+double ChannelTableModel::cn0(uint32_t prn, const std::string & signal, const char system)
 {
     int ch = channel(prn,signal,system);
     if(ch<0)
@@ -437,7 +437,7 @@ double ChannelTableModel::cn0(int prn, const std::string & signal, const char sy
     return m_channelsCn0[ch].at(m_channelsCn0[ch].size() - 1);
 }
 
-int ChannelTableModel::channel(int prn, const std::string & signal, const char system)
+int ChannelTableModel::channel(uint32_t prn, const std::string & signal, const char system)
 {
     auto it = m_sigChannel.find(prn);
     if(it == m_sigChannel.end())
@@ -458,6 +458,11 @@ int ChannelTableModel::channel(int prn, const std::string & signal, const char s
         if(it1 == it->second.end())
             return -1;
     }
+    if(m_channels[it1->second].prn()!=prn)
+    {
+        it->second.erase(sig);
+        return -1;
+    }
     if(m_active.find(it1->second) == m_active.end())
         return -1;
     return it1->second;
@@ -468,7 +473,7 @@ void ChannelTableModel::clearUsed()
     m_used.clear();
 }
 
-void ChannelTableModel::setUsed(int prn, const std::string & signal, bool used)
+void ChannelTableModel::setUsed(uint32_t prn, const std::string & signal, bool used)
 {
     int ch = channel(prn, signal,'\0');
     if(ch < 0)
