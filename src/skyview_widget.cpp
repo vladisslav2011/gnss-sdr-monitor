@@ -121,9 +121,9 @@ void SkyViewWidget::finishUpdate()
             it++;
 }
 
-void SkyViewWidget::selectSat(uint32_t prn, std::string signal)
+void SkyViewWidget::selectSat(uint32_t prn, char system)
 {
-    m_sel_item = std::pair<std::string,uint32_t>(signal,prn);
+    m_sel_item = std::pair<char,uint32_t>(system,prn);
     redraw();
 }
 
@@ -192,9 +192,9 @@ void SkyViewWidget::mousePressEvent(QMouseEvent* event)
         }
 
     if(p)
-        emit satSelected(p->prn, p->Signal);
+        emit satSelected(p->prn, p->System[0]);
     else
-        emit satSelected(0, "");
+        emit satSelected(0, ' ');
 }
 
 void SkyViewWidget::draw(QPainter &painter)
@@ -235,7 +235,7 @@ void SkyViewWidget::draw(QPainter &painter)
     int_data * sel_item{};
     for(auto& it: m_items)
     {
-        if(it.first == m_sel_item)
+        if(it.second.System[0] == m_sel_item.first && it.second.prn == m_sel_item.second)
             sel_item=&it.second;
         if(it.first == m_top_item)
         {

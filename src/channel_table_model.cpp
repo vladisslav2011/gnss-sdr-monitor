@@ -252,7 +252,7 @@ QVariant ChannelTableModel::data(const QModelIndex &index, int role) const
 
             const gnss_sdr::GnssSynchro & channel = m_channels.at(channel_id);
             const bool isUsed=m_used.find(channel_id) != m_used.end();
-            const bool isSelected = channel.prn() == m_sel_item.second && channel.signal() == m_sel_item.first;
+            const bool isSelected = channel.prn() == m_sel_item.second && channel.system()[0] == m_sel_item.first;
             if(!isUsed && !isSelected)
                 return QVariant::Invalid;
             if(isUsed && isSelected)
@@ -490,7 +490,7 @@ void ChannelTableModel::clearUsed()
 
 void ChannelTableModel::setUsed(uint32_t prn, const std::string & signal, bool used)
 {
-    int ch = channel(prn, signal,'\0');
+    int ch = channel(prn, signal,' ');
     if(ch < 0)
         return;
     if(used)
@@ -639,9 +639,9 @@ QModelIndex ChannelTableModel::channel_index(int channel, int column) const
     return index(row, column);
 }
 
-void ChannelTableModel::selectSat(uint32_t prn, std::string signal)
+void ChannelTableModel::selectSat(uint32_t prn, char system)
 {
-    m_sel_item = std::pair<std::string,uint32_t>(signal,prn);
+    m_sel_item = std::pair<char,uint32_t>(system,prn);
     emit dataChanged(createIndex(0,0),createIndex(11,m_channels.size()-1));
 }
 
@@ -653,10 +653,10 @@ uint32_t ChannelTableModel::getPrn(int channelId) const
     return it->second.prn();
 }
 
-const std::string ChannelTableModel::getSignal(int channelId) const
+char ChannelTableModel::getSystem(int channelId) const
 {
     auto it = m_channels.find(channelId);
     if(it == m_channels.end())
-        return "";
-    return it->second.signal();
+        return ' ';
+    return it->second.system()[0];
 }

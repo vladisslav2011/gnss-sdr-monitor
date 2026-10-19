@@ -411,10 +411,10 @@ void MainWindow::expandPlot(const QModelIndex &index)
 
     if (index.column() < 5)
     {
-        std::string sig = m_model->getSignal(channel_id);
+        char sys = m_model->getSystem(channel_id);
         uint32_t prn = m_model->getPrn(channel_id);
-        m_model->selectSat(prn,sig);
-        m_SkyViewWidget->selectSat(prn,sig);
+        m_model->selectSat(prn,sys);
+        m_SkyViewWidget->selectSat(prn,sys);
     }
     else if (index.column() == 5)  // Constellation
     {
